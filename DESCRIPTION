@@ -6,6 +6,13 @@ Authors@R:
     person("Maxime", "Bélanger De Blois", email = "maxime.belangerdeblois@mcgill.ca", role = "cre"),
     person("David", "Wachsmuth", email = "david.wachsmuth@mcgill.ca", role  = "ctb"))
 Description: A copy of the `curbcut` package, streamlined to function as an API. This package provides selected functions from the original curbcut package, facilitating the transition to a modern web dev stack while maintaining essential R-based API functionalities.
+Imports:
+  data.table,
+  ggplot2,
+  glue,
+  scales,
+  plumber,
+  pool
 License: AGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
