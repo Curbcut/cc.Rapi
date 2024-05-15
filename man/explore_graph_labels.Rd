@@ -6,11 +6,11 @@
 \alias{explore_graph_labels.default}
 \title{Generic legend label function for Curbcut legends}
 \usage{
-explore_graph_labels(vars, lang = NULL, ...)
+explore_graph_labels(vars, lang = NULL, variables = variables, time, ...)
 
-\method{explore_graph_labels}{delta}(vars, lang = NULL, time, ...)
+\method{explore_graph_labels}{delta}(vars, lang = NULL, variables = variables, time, ...)
 
-\method{explore_graph_labels}{default}(vars, lang = NULL, time, ...)
+\method{explore_graph_labels}{default}(vars, lang = NULL, variables = variables, time, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> A list object with a pre-determined class. The
@@ -19,9 +19,9 @@ output of \code{\link{vars_build}}.}
 \item{lang}{<\code{character}> A character string indicating the language to
 translate variable titles to.}
 
-\item{...}{Arguments to be passed to the methods, e.g. optionally \code{lang}}
-
 \item{time}{<\verb{named list}> A named list with the time variables.}
+
+\item{...}{Arguments to be passed to the methods, e.g. optionally \code{lang}}
 }
 \value{
 It returns an output of \code{\link[ggplot2]{labs}}.

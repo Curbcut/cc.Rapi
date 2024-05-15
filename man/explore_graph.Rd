@@ -18,7 +18,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -31,7 +31,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -44,7 +44,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -57,7 +57,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -70,7 +70,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -83,7 +83,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   val = NULL,
@@ -97,7 +97,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -110,7 +110,7 @@ explore_graph(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   ...
@@ -135,10 +135,6 @@ A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$t
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
-\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
-that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
-their graph will be the one of their DA.}
-
 \item{lang}{<\code{character}> A character string indicating the language to
 translate variable titles to.}
 
@@ -150,6 +146,10 @@ plot, default is "acidgrotesk-book".}
 \item{val}{<\code{numeric}> If the value is not part of \code{data}. It happens on raster
 data where we show region values for the highest resolution possible, but we still
 want to allow user to select grid cells of lower resolutions.}
+
+\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
+that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
+their graph will be the one of their DA.}
 }
 \value{
 A ggplot2 object representing the plot.

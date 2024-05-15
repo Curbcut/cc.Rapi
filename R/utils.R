@@ -614,39 +614,6 @@ grab_DA_ID_from_bslike <- function(scale, select_id) {
   return(out)
 }
 
-#' Grab row from a building-street-like dataframe (large!)
-#'
-#' This function fetches the row matching with the selected ID from a given
-#' dataframe `scale` based on a provided `select_id`. It can also fetch the row
-#' from a connected database when the `df` is not found in the global environment
-#' but is identified as a scales_as_DA'. In such cases, it uses the established
-#' connection and fetches the row via a SQL query.
-#'
-#' @param scale <`character`> A string, the name of the dataframe in which to look
-#' for row. The dataframe should be in the global environment, and if it isn't,
-#' there must be an established sqlite connection to it.
-#' @param select_id <`character`> A value representing the ID that needs to be
-#' selected in order to fetch the corresponding row.
-#' @param cols <`character vector`> Which columns to retrieve. Defaults to `'*'` for
-#' all columns.
-#'
-#' @return The row corresponding to the given `select_id`. If
-#' `select_id` is found in the `df` in the global environment, the corresponding
-#' row is returned. If `df` is a 'scales_as_DA' and not in the global
-#' environment, the function fetches row from the connected database.
-grab_row_from_bslike <- function(scale, select_id, cols = "*") {
-  dat <- get0(scale, envir = .GlobalEnv)
-  # If it's a 'scales_as_DA', and the `df` is not in the global environment,
-  # search for a connection.
-  out <- if (is.null(dat)) {
-    db_get(select = cols, from = scale, where = list(ID = select_id))
-  } else {
-    dat[dat$ID == select_id, ]
-  }
-
-  return(out)
-}
-
 #' Grab full dataframe from a building-street-like dataframe (large!)
 #'
 #' This function fetches the full dataframe matching with `df`. It can also fetch
@@ -1113,29 +1080,3 @@ delta_which_colors <- function(data) {
   if ("positive" %in% class(data)) return(colours_dfs$delta_pos)
 }
 
-#' Safely evaluate reactive and non-reactive arguments
-#'
-#' This function iterates over a list of arguments and evaluates them. If an
-#' argument is a reactive expression, it is evaluated to obtain its current
-#' value. Non-reactive arguments are returned as is.
-#'
-#' @param argList <`list`> A list containing both reactive and non-reactive
-#' arguments. Reactive arguments are expected to be Shiny reactive expressions
-#' that need to be evaluated to obtain their current values. Non-reactive
-#' arguments are any other values or objects that do not require evaluation.
-#'
-#' @return A list of the same length as `argList`, where each element is the
-#' evaluated value of the corresponding argument in `argList`. Reactive
-#' expressions are evaluated to their current value, and non-reactive arguments
-#' are returned unchanged.
-safeEvaluate <- function(argList) {
-
-  lapply(argList, function(arg) {
-    if (shiny::is.reactive(arg)) {
-      return(arg())
-    } else {
-      return(arg)
-    }
-  })
-
-}

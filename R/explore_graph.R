@@ -26,20 +26,20 @@
 #'
 #' @return A ggplot2 object representing the plot.
 #' @export
-explore_graph <- function(vars, select_id, scale, data, time, schemas,
-                          scales_as_DA = c("building", "street"), lang = NULL,
-                          font_family = "acidgrotesk-book", ...) {
+explore_graph <- function(vars, select_id, scale, data, time, schemas, variables,
+                          lang = NULL, font_family = "acidgrotesk-book",
+                          ...) {
   UseMethod("explore_graph", vars)
 }
 
 #' @rdname explore_graph
 #' @export
 explore_graph.q5_ind <- function(vars, select_id, scale, data, time, schemas,
-                                 scales_as_DA = c("building", "street"), lang = NULL,
+                                 variables, lang = NULL,
                                  font_family = "acidgrotesk-book", ...) {
   explore_graph_q5_ind(
     vars = vars, select_id = select_id, scale = scale,
-    data = data, time = time, scales_as_DA = scales_as_DA,
+    data = data, time = time, variables = variables,
     lang = lang, font_family = "acidgrotesk-book", ...
   )
 }
@@ -47,7 +47,7 @@ explore_graph.q5_ind <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph
 #' @export
 explore_graph.q5 <- function(vars, select_id, scale, data, time, schemas,
-                             scales_as_DA = c("building", "street"), lang = NULL,
+                             variables, lang = NULL,
                              font_family = "acidgrotesk-book", ...) {
   # Appease R CMD check
   var_left <- x <- ..count.. <- NULL
@@ -55,7 +55,7 @@ explore_graph.q5 <- function(vars, select_id, scale, data, time, schemas,
   # Grab the shared info between the graphs
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
-    scales_as_DA = scales_as_DA, select_id = select_id,
+    variables = variables, select_id = select_id,
     data = data, lang = lang, scale = scale, ...
   )
 
@@ -135,7 +135,7 @@ explore_graph.q5 <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph
 #' @export
 explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
-                                scales_as_DA = c("building", "street"), lang = NULL,
+                                variables, lang = NULL,
                                 font_family = "acidgrotesk-book", ...) {
   # Appease R CMD check
   var_left <- var_right <- group <- NULL
@@ -143,7 +143,7 @@ explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
   # Grab the shared info between the graphs
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
-    scales_as_DA = scales_as_DA, select_id = select_id,
+    variables = variables, select_id = select_id,
     data = data, lang = lang, scale = scale, ...
   )
   # Color as function
@@ -191,13 +191,13 @@ explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
   x_scale <- explore_graph_scale(
     var = vars$var_right,
     x_y = "x",
-    scale = shared_info$treated_scale,
+    scale = scale,
     data_vals = data_in_range[[vr_col]]
   )
   y_scale <- explore_graph_scale(
     var = vars$var_left,
     x_y = "y",
-    scale = shared_info$treated_scale,
+    scale = scale,
     data_vals = data_in_range[[vl_col]]
   )
 
@@ -266,12 +266,12 @@ explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph
 #' @export
 explore_graph.delta_ind <- function(vars, select_id, scale, data, time, schemas,
-                                    scales_as_DA = c("building", "street"), lang = NULL,
+                                    variables, lang = NULL,
                                     font_family = "acidgrotesk-book", ...) {
   explore_graph_delta_ind(
     vars = vars, select_id = select_id, scale = scale,
     data = data, time = time, schemas = schemas,
-    scales_as_DA = scales_as_DA, lang = lang,
+    variables = variables, lang = lang,
     font_family = font_family, ...
   )
 }
@@ -282,7 +282,7 @@ explore_graph.delta_ind <- function(vars, select_id, scale, data, time, schemas,
 #' want to allow user to select grid cells of lower resolutions.
 #' @export
 explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
-                                scales_as_DA = c("building", "street"), lang = NULL,
+                                variables, lang = NULL,
                                 font_family = "acidgrotesk-book", val = NULL, ...) {
   # Appease R CMD check
   var_left_1 <- var_left_2 <- group <- NULL
@@ -290,7 +290,7 @@ explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
   # Grab the shared info between the graphs
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
-    scales_as_DA = scales_as_DA, select_id = select_id,
+    variables = variables, select_id = select_id,
     data = data, lang = lang, scale = scale, time = time, ...
   )
 
@@ -307,14 +307,14 @@ explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
       class = class(vars$var_left)
     ),
     x_y = "x",
-    df = shared_info$treated_scale,
+    df = scale,
     data_vals = data[[xcol]]
   )
   y_scale <- explore_graph_scale(
     var = structure(vars$var_left,
       class = class(vars$var_left)
     ),
-    df = shared_info$treated_scale,
+    df = scale,
     x_y = "y",
     data_vals = data[[ycol]]
   )
@@ -381,7 +381,7 @@ explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph
 #' @export
 explore_graph.delta_bivar <- function(vars, select_id, scale, data, time, schemas,
-                                      scales_as_DA = c("building", "street"), lang = NULL,
+                                      variables, lang = NULL,
                                       font_family = "acidgrotesk-book", ...) {
   # Appease R CMD check
   var_left <- var_right <- group <- NULL
@@ -389,7 +389,7 @@ explore_graph.delta_bivar <- function(vars, select_id, scale, data, time, schema
   # Grab the shared info between the graphs
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
-    scales_as_DA = scales_as_DA, select_id = select_id,
+    variables = variables, select_id = select_id,
     data = data, lang = lang, scale = scale, time = time, ...
   )
 
@@ -460,10 +460,10 @@ explore_graph.delta_bivar <- function(vars, select_id, scale, data, time, schema
 #' @rdname explore_graph
 #' @export
 explore_graph.bivar_ind <- function(vars, select_id, scale, data, time, schemas,
-                                    scales_as_DA = c("building", "street"), lang = NULL,
+                                    variables, lang = NULL,
                                     font_family = "acidgrotesk-book", ...) {
   explore_graph_bivar_ind(
     vars = vars, select_id = select_id, scale = scale, data = data, time = time, schemas = schemas,
-    scales_as_DA = scales_as_DA, lang = lang, font_family = "acidgrotesk-book", ...
+    variables = variables, lang = lang, font_family = "acidgrotesk-book", ...
   )
 }

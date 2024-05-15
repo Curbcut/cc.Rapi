@@ -24,12 +24,12 @@
 #' returns a list with elements like \code{val} and \code{count}.
 #' @export
 region_value <- function(var, data, time, scale, region, select_id, col, schemas = NULL,
-                         data_path, ...) {
+                         data_path, variables, ...) {
   # Get the parent variable data
   rv <- region_value_data_grab(
     var = var, data = data, time = time, col = col,
     scale = scale, region = region, schemas = schemas,
-    data_path = data_path
+    data_path = data_path, variables = variables
   )
 
   # Return the output of every method
@@ -173,7 +173,7 @@ region_value_method.default <- function(var, data_vals, parent_vals, ...) {
 region_value_data_grab <- function(var, data, time, scale, region, col, schemas = NULL,
                                    data_path) {
   # Get the parent variable
-  parent_string <- var_get_info(var, what = "parent_vec")
+  parent_string <- var_get_info(var, variables = variables, what = "parent_vec")
 
   # Grab parent data
   if ("count" %in% class(var)) {

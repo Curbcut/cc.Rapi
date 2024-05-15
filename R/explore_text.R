@@ -31,7 +31,7 @@
 #' @export
 explore_text <- function(vars, region, select_id, scale, time, data,
                          schemas, zoom_levels,
-                         scales_as_DA = c("building", "street"),
+                         variables,
                          lang = NULL, ...) {
   UseMethod("explore_text", vars)
 }
@@ -53,22 +53,19 @@ explore_text <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.q5 <- function(vars, region, select_id, scale, time, data,
                             schemas, zoom_levels,
-                            scales_as_DA = c("building", "street"),
+                            variables,
                             lang = NULL, shown_scale = NULL, val = NULL, ...) {
-  # Detect if we should switch the scale for DAs in the case the `scale` is part
-  # of the `scales_as_DA` argument.
-  switch_DA <- is_scale_in(scales_as_DA, scale)
 
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
   if (is.null(shown_scale) & is.null(val)) {
-    if (!switch_DA && !select_id %in% data$ID) select_id <- NA
+    if (!select_id %in% data$ID) select_id <- NA
   }
 
   # Grab the shared info
   context <- explore_context(
-    region = region, select_id = select_id, scale = scale, shown_scale = shown_scale,
-    zoom_levels = zoom_levels, switch_DA = switch_DA, lang = lang
+    region = region, select_id = select_id, scale = scale,
+    shown_scale = shown_scale, zoom_levels = zoom_levels, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -90,8 +87,8 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
   value_string <- explore_text_values_q5(
     var = vars$var_left, region = region,
     select_id = select_id, data = data,
-    scale = context$treated_scale, lang = lang,
-    time = time, schemas = schemas, val = val
+    scale = scale, lang = lang,
+    time = time, schemas = schemas, val = val, variables = variables
   )
 
   # Put it all together
@@ -158,7 +155,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.bivar <- function(vars, region, select_id, scale, time, data,
                                schemas, zoom_levels,
-                               scales_as_DA = c("building", "street"),
+                               variables,
                                lang = NULL, ...) {
   # Append date function helper
   append_date <- \(out) {
@@ -191,17 +188,13 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
     gsub("</ul></span> ", "</ul></span><p>...", out)
   }
 
-  # Detect if we should switch the scale for DAs in the case the `scale` is part
-  # of the `scales_as_DA` argument.
-  switch_DA <- is_scale_in(scales_as_DA, scale)
-
   # Adjust the selected ID in the case where the selection is not in `data`
-  if (!switch_DA && !select_id %in% data$ID) select_id <- NA
+  if (!select_id %in% data$ID) select_id <- NA
 
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    zoom_levels = zoom_levels, switch_DA = switch_DA, lang = lang
+    zoom_levels = zoom_levels, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -224,7 +217,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
     value_string_left <- explore_text_values_q5(
       var = vars$var_left, region = region,
       select_id = select_id, data = data, time = time,
-      scale = context$treated_scale, lang = lang,
+      scale = scale, lang = lang,
       col = "var_left", schemas = schemas
     )
 
@@ -232,7 +225,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
     value_string_right <- explore_text_values_q5(
       var = vars$var_right, region = region,
       select_id = select_id, data = data,
-      scale = context$treated_scale, time = time,
+      scale = scale, time = time,
       col = "var_right", lang = lang, schemas = schemas
     )
 
@@ -452,22 +445,19 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.delta <- function(vars, region, select_id, scale, time, data,
                                schemas, zoom_levels,
-                               scales_as_DA = c("building", "street"),
+                               variables,
                                lang = NULL, shown_scale = NULL, val = NULL, ...) {
-  # Detect if we should switch the scale for DAs in the case the `scale` is part
-  # of the `scales_as_DA` argument.
-  switch_DA <- is_scale_in(scales_as_DA, scale)
 
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
   if (is.null(shown_scale) & is.null(val)) {
-    if (!switch_DA && !select_id %in% data$ID) select_id <- NA
+    if (!select_id %in% data$ID) select_id <- NA
   }
 
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale, shown_scale = shown_scale,
-    zoom_levels = zoom_levels, switch_DA = switch_DA, lang = lang
+    zoom_levels = zoom_levels, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -489,7 +479,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   exp_vals <- explore_text_delta_exp(
     var = vars$var_left, region = region,
     select_id = select_id, data = data,
-    scale = context$treated_scale,
+    scale = scale,
     left_right = "left", lang = lang,
     time = time, schemas = schemas, val = val,
     single_val = TRUE
@@ -592,19 +582,16 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
                                      schemas, zoom_levels,
-                                     scales_as_DA = c("building", "street"),
+                                     variables,
                                      lang = NULL, ...) {
-  # Detect if we should switch the scale for DAs in the case the `scale` is part
-  # of the `scales_as_DA` argument.
-  switch_DA <- is_scale_in(scales_as_DA, scale)
 
   # Adjust the selected ID in the case where the selection is not in `data`
-  if (!switch_DA && !select_id %in% data$ID) select_id <- NA
+  if (!select_id %in% data$ID) select_id <- NA
 
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    zoom_levels = zoom_levels, switch_DA = switch_DA, lang = lang
+    zoom_levels = zoom_levels, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -625,13 +612,13 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
   exp_vals_left <- explore_text_delta_exp(
     var = vars$var_left, region = region,
     select_id = select_id, data = data,
-    scale = context$treated_scale, left_right = "left",
+    scale = scale, left_right = "left",
     lang = lang, time = time, schemas = schemas
   )
   exp_vals_right <- explore_text_delta_exp(
     var = vars$var_right, region = region,
     select_id = select_id, data = data,
-    scale = context$treated_scale, left_right = "right",
+    scale = scale, left_right = "right",
     lang = lang, time = time, schemas = schemas
   )
 

@@ -8,20 +8,20 @@
 #' output of \code{\link{vars_build}}.
 #' @param lang <`character`> A character string indicating the language to
 #' translate variable titles to.
+#' @param time <`named list`> A named list with the time variables.
 #' @param ... Arguments to be passed to the methods, e.g. optionally `lang`
 #'
 #' @return It returns an output of \code{\link[ggplot2]{labs}}.
 #' @export
-explore_graph_labels <- function(vars, lang = NULL, ...) {
+explore_graph_labels <- function(vars, lang = NULL, variables = variables, time, ...) {
   UseMethod("explore_graph_labels", vars)
 }
 
 #' @rdname explore_graph_labels
-#' @param time <`named list`> A named list with the time variables.
 #' @export
-explore_graph_labels.delta <- function(vars, lang = NULL, time, ...) {
+explore_graph_labels.delta <- function(vars, lang = NULL, variables = variables, time, ...) {
   title <- var_get_title(
-    var = vars$var_left, short_treshold = 16,
+    var = vars$var_left, variables = variables, short_treshold = 16,
     translate = TRUE, lang = lang
   )
 
@@ -33,6 +33,6 @@ explore_graph_labels.delta <- function(vars, lang = NULL, time, ...) {
 
 #' @rdname explore_graph_labels
 #' @export
-explore_graph_labels.default <- function(vars, lang = NULL, time, ...) {
-  legend_labels(vars = vars, lang = lang, time = time, ...)[[1]]
+explore_graph_labels.default <- function(vars, lang = NULL, variables = variables, time, ...) {
+  legend_labels(vars = vars, variables = variables, lang = lang, time = time, ...)[[1]]
 }

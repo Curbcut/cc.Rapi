@@ -9,7 +9,7 @@ explore_graph_info(
   font_family = "acidgrotesk-book",
   lang = NULL,
   scale,
-  scales_as_DA,
+  variables,
   select_id,
   data,
   time,
@@ -29,10 +29,6 @@ translate variable titles to.}
 \item{scale}{<\verb{reactive character}> Current scale. The output of
 \code{\link{update_scale}}.}
 
-\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
-that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
-their graph will be the one of their DA.}
-
 \item{select_id}{<\code{character}> A string indicating the ID of the currently
 selected region (if any). Usually \code{r[[id]]$select_id()}}
 
@@ -43,6 +39,10 @@ observations. The output of \code{\link{data_get}}.}
 A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.}
 
 \item{...}{Additional arguments passed to the specific method.}
+
+\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
+that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
+their graph will be the one of their DA.}
 }
 \value{
 A list containing the default theme and color data frames.

@@ -30,8 +30,9 @@
 explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
                             shown_scale = NULL, lang = NULL) {
   # Grab the region dictionary
-  regions_dictionary <- get_from_globalenv("regions_dictionary")
-  region_df <- regions_dictionary[regions_dictionary$region == region, ]
+  region_df <- db_get(select = c("to_compare", "to_compare_determ", "to_compare_short"),
+                      from = "regions_dictionary", where = list(region = region),
+                      schema = "mtl")
 
   # Prepare a return when there is no selection
   region_only_return <- \(region_df) {
@@ -39,7 +40,7 @@ explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
     to_compare <- cc_t(region_df$to_compare, lang = lang)
 
     # Return as a sentence
-    return(list(p_start = to_compare, treated_scale = scale, select_id = NA))
+    return(list(p_start = to_compare, select_id = NA))
   }
 
   # If there is no selection, return the region text only
@@ -49,71 +50,28 @@ explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
 
   # Grab the right scale
   scale_grab_chr_for <- if (!is.null(shown_scale)) shown_scale else scale
+  scale_df <-  db_get(select = c("place_heading", "place_name", "plur"),
+                      from = "scales_dictionary", where = list(scale = scale_grab_chr_for),
+                      schema = "mtl")
 
-  scales_dictionary <- get_from_globalenv("scales_dictionary")
-  scale_df <- scales_dictionary[
-    is_scale_in(scales_dictionary$scale, scale = scale_grab_chr_for, vectorized = TRUE),
-  ]
+  # Get the place heading and glue it
+  dat <- db_get(select = c("name", "name_2"),
+                from = scale_grab_chr_for, where = list(ID = select_id),
+                schema = "mtl")
 
-  # Normal retrieval when the `df` is not part of the scales to treat as
-  # DA.
-  if (!switch_DA) {
-    # Get the place heading and glue it
-    dat <- grab_row_from_bslike(
-      scale = scale_grab_chr_for, select_id = select_id,
-      cols = c("name", "name_2")
+  # the selection is not found in the database
+  if (nrow(dat) == 0) return(region_only_return(region_df))
+
+  name <- dat$name
+  name_2 <- dat$name_2
+  if (is.na(name_2)) {
+    name_2 <- fill_name_2(
+      ID_scale = select_id, scale = scale_grab_chr_for,
+      top_scale = names(zoom_levels)[[1]]
     )
-    # the selection is not found in the database
-    if (nrow(dat) == 0) return(region_only_return(region_df))
-
-    name <- dat$name
-    name_2 <- dat$name_2
-    if (is.na(name_2)) {
-      name_2 <- fill_name_2(
-        ID_scale = select_id, scale = scale_grab_chr_for,
-        top_scale = names(zoom_levels)[[1]]
-      )
-    }
-    name_2 <- cc_t(name_2, lang = lang)
-    heading <- cc_t(scale_df$place_heading, lang = lang)
-    treated_scale <- scale
   }
-
-  # Tweaked retrieval when the `df` is part of the scales to treat as DAs.
-  if (switch_DA) {
-    # Grab the DA ID and the address from the SQL database
-    bs <- grab_row_from_bslike(
-      scale = scale, select_id = select_id,
-      cols = c("name", "DA_ID")
-    )
-
-    # If the selection ID is not in the SQL database, return the region only text
-    # with an empty NA. The text that will be showed is the basic one for the region.
-    if (nrow(bs) == 0) {
-      out <- region_only_return(region_df)
-      out$select_id <- NA
-      return(out)
-    }
-
-    # Get the heading
-    name <- sprintf(cc_t("around %s", lang = lang), bs$name)
-    heading <- sprintf(
-      cc_t("Dissemination area %s", lang = lang),
-      cc_t(scale_df$place_heading, lang = lang)
-    )
-
-    # Switch the select_id, to be able to use the data values of the `DA`
-    select_id <- bs$DA_ID
-
-    # Switch df to DA
-    treated_scale <- "DA"
-
-    # Switch the scale
-    scale_df <- scales_dictionary[is_scale_in(scales_dictionary$scale,
-                                              treated_scale,
-                                              vectorized = TRUE
-    ), ]
-  }
+  name_2 <- cc_t(name_2, lang = lang)
+  heading <- cc_t(scale_df$place_heading, lang = lang)
 
   # Get the sentence start (In Borough or In dissemination area XYZ, )
   p_start <- cc_t(scale_df$place_name, lang = lang)
@@ -126,8 +84,7 @@ explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
     to_compare_determ = cc_t(region_df$to_compare_determ, lang = lang),
     to_compare_short = cc_t(region_df$to_compare_short, lang = lang),
     scale_plur = cc_t(scale_df$plur, lang = lang),
-    select_id = select_id,
-    treated_scale = treated_scale
+    select_id = select_id
   ))
 }
 
@@ -142,13 +99,12 @@ explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
 #' for no translation.
 #'
 #' @return The title of the parent variable in lowercase.
-explore_text_parent_title <- function(var, lang = NULL) {
+explore_text_parent_title <- function(var, variables, lang = NULL) {
   # Get the parent_vec of the current variable
-  parent_string <- var_get_info(var = var, what = "parent_vec")
+  parent_string <- var_get_info(var = var, variables = variables, what = "parent_vec")
 
   # Grab the title of that parent_vec
   # If the parent vector is not in the variables table, return it
-  variables <- get_from_globalenv("variables")
   if (!parent_string %in% variables$var_code) {
     if (parent_string == "population") {
       return(cc_t("individuals", lang = lang))
@@ -157,7 +113,7 @@ explore_text_parent_title <- function(var, lang = NULL) {
   }
 
   parent_string <- var_get_info(
-    var = parent_string, what = "var_title",
+    var = parent_string, variables = variables, what = "var_title",
     check_year = FALSE, translate = TRUE, lang = lang
   )
 
@@ -203,13 +159,13 @@ explore_text_parent_title <- function(var, lang = NULL) {
 #' selection.
 explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
                                        scale, data, lang = NULL, time, schemas = NULL,
-                                       data_path = get_data_path(), ...) {
+                                       data_path = get_data_path(), variables, ...) {
   if (is.na(select_id)) {
     # Grab the region values dataframe
     region_values <- region_value(
       var = var, data = data, time = time, col = col,
       scale = scale, region = region, schemas = schemas,
-      data_path = data_path
+      data_path = data_path, variables = variables
     )
 
     # Return the values

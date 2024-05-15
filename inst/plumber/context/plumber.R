@@ -16,8 +16,11 @@ on.exit(pool::poolClose(db_pool), add = TRUE)
 #* @param time etc
 #* @param select_id etc
 #* @get /echo
-function(var_left, var_right = " ", scale, region = NULL, time, select_id) {
+function(var_left, var_right = " ", scale, region = NULL, time, select_id,
+         lang = NULL, schemas = list(var_left = list(time = time), var_right = list(time = time))) {
   promises::future_promise({
-    context(var_left, var_right, scale, region, time, select_id)
+    context(var_left = var_left, var_right = var_right, scale = scale,
+            region = region, time = time, select_id = select_id,
+            lang = lang, schemas = schemas)
   })
 }

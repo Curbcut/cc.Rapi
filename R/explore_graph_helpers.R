@@ -24,7 +24,7 @@
 #'
 #' @return A list containing the default theme and color data frames.
 explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NULL,
-                               scale, scales_as_DA, select_id, data, time, ...) {
+                               scale, variables, select_id, data, time, ...) {
   # Create the theme
   theme_default <- list(
     ggplot2::theme_minimal(),
@@ -38,18 +38,12 @@ explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NU
   )
 
   # Use the legend labels
-  labs <- explore_graph_labels(vars = vars, lang = lang, time = time, ...)
+  labs <- explore_graph_labels(vars = vars, lang = lang, time = time,
+                               variables = variables, ...)
 
   # Grab the colours
   colours_dfs <- colours_get()
 
-  # In the case where the selected ID must be updated
-  if (is_scale_in(scales_as_DA, scale) & !is.na(select_id)) {
-    select_id <- grab_DA_ID_from_bslike(scale = scale, select_id = select_id)
-  }
-
-  # df treatment if it's in the scales as DA
-  treated_scale <- treat_to_DA(scales_as_DA = scales_as_DA, scale = scale)
 
   # In the case where the selected ID is not in data, clear the selection
   if (!is.na(select_id) & !select_id %in% data$ID) {
@@ -61,8 +55,7 @@ explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NU
     theme_default = theme_default,
     colours_dfs = colours_dfs,
     labs = labs,
-    select_id = select_id,
-    treated_scale = treated_scale
+    select_id = select_id
   ))
 }
 

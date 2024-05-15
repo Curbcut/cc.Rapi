@@ -466,18 +466,11 @@ filter_region <- function(data, scale, region) {
     return(data)
   }
 
-  # Get the regions dictionary to grab the vector of IDs with which to filter
-  # the retrieved data
-  regions_dictionary <- get_from_globalenv("regions_dictionary")
+  warning("TKTKT WHY ARE WE EVEN USING THIS? WE SHOULD FILTER IN THE DATA IMPORT SQL CALL")
 
-  # Vector of IDs for the current region and scale
-  scales <- regions_dictionary$scales[regions_dictionary$region == region][[1]]
-  id_reg <- scales[[scale]]
-
-  if (is.null(id_reg)) {
-    stop(sprintf("Scale `%s` is not in the regions_dictionary for region `%s`",
-                 scale, region))
-  }
+  # TKTKTK THIS IS NOT OPTIMIZED, WE ARE EXTRACTING ALL THE SCALES
+  id_reg <- db_get(select = "scales", from = "regions_dictionary", where = list(region = region),
+                   schema = "mtl")$scales[[1]][[scale]]
 
   data <- data[data$ID %in% id_reg, ]
 
