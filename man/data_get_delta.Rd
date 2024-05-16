@@ -4,7 +4,7 @@
 \alias{data_get_delta}
 \title{Calculate the percentage change between two variables over two years}
 \usage{
-data_get_delta(vars, time, scale, vl_vr = "var_left")
+data_get_delta(vars, time, scale, variables, region, vl_vr = "var_left")
 }
 \arguments{
 \item{vars}{<\verb{character vector}> A var_code. The variable to get data for.}
@@ -14,6 +14,9 @@ two years for which the delta should be calculated.}
 
 \item{scale}{<\code{character}> A string specifying the scale at which to retrieve
 data, corresponding to a path on disk, e.g. \code{DA} or \code{CSD}.}
+
+\item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
+both var_left and var_right, and any potential parent variable aswell.}
 
 \item{vl_vr}{<\code{character}> Which of var_left or var_right is this delta supposed
 to be for. Defaults to var_left.}

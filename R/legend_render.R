@@ -8,8 +8,7 @@
 #' @param font_family <`character`> Which font family should be used to render
 #' the legend (breaks, axis titles, ...). Defaults to `acidgrotesk-book`. To use
 #' the default font family og ggplot2, use `NULL`.
-#' @param scale <`character`> Scale under study. The output of
-#' \code{\link{update_scale}}.
+#' @param scale <`character`> Scale under study.
 #' @param data <`data.frame`> The current data. The output of \code{\link{data_get}}.
 #' @param ... Additional arguments to be passed to \code{\link{legend_labels}}
 #' and \code{\link{legend_breaks}}, such as `lang`, `time`, ...
@@ -51,8 +50,7 @@ legend_get_info <- function(vars, font_family = "acidgrotesk-book",
 #' @param font_family <`character`> Which font family should be used to render
 #' the legend (breaks, axis titles, ...). Defaults to `acidgrotesk-book`. To use
 #' the default font family og ggplot2, use `NULL`.
-#' @param scale <`character`> Scale under study. The output of
-#' \code{\link{update_scale}}.
+#' @param scale <`character`> Scale under study.
 #' @param data <`data.frame`> The current data. The output of \code{\link{data_get}}.
 #'
 #' @param ... Arguments to be passed to the methods, e.g. optionally `lang`
@@ -355,8 +353,7 @@ legend_render.delta <- function(vars, font_family = "acidgrotesk-book",
 #' @param font_family <`character`> Which font family should be used to render
 #' the legend (breaks, axis titles, ...). Defaults to `acidgrotesk-book`. To use
 #' the default font family og ggplot2, use `NULL`.
-#' @param scale <`character`> Scale under study. The output of
-#' \code{\link{update_scale}}.
+#' @param scale <`character`> Scale under study.
 #' @param data <`data.frame`> The current data. The output of \code{\link{data_get}}.
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.

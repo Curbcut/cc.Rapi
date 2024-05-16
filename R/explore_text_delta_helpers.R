@@ -14,8 +14,7 @@
 #' options are "left" or "right".
 #' @param time <`numeric named list`> The `time` at which data is displayed.
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
-#' @param scale <`character`> The scale under study. The output of
-#' \code{\link{update_scale}}.
+#' @param scale <`character`> The Scale under study.
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The data frame must have columns named var_left
 #' and ID. The output of \code{\link{data_get}}.

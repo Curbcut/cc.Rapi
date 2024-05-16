@@ -10,7 +10,6 @@
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
 #' @param scale <`character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param time <`numeric named list`> The `time` at which data is displayed.
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param schemas <`named list`> Current schema information. The additional widget

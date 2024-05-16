@@ -63,8 +63,7 @@ options are "left" or "right".}
 \item{time}{<\verb{numeric named list}> The \code{time} at which data is displayed.
 A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.}
 
-\item{scale}{<\code{character}> The scale under study. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> The Scale under study.}
 
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The data frame must have columns named var_left

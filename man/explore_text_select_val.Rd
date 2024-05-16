@@ -7,22 +7,24 @@
 \alias{explore_text_select_val.default}
 \title{Generate values for the given variable and selection}
 \usage{
-explore_text_select_val(var, ...)
+explore_text_select_val(var, variables, ...)
 
 \method{explore_text_select_val}{pct}(
   var,
+  variables,
   select_id,
   data,
   scale,
   col = "var_left",
   time,
   schemas = NULL,
-  data_path,
+  region,
   ...
 )
 
 \method{explore_text_select_val}{ind}(
   var,
+  variables,
   data,
   select_id,
   col = "var_left",
@@ -34,6 +36,7 @@ explore_text_select_val(var, ...)
 
 \method{explore_text_select_val}{default}(
   var,
+  variables,
   data,
   select_id,
   col = "var_left",
@@ -54,8 +57,7 @@ values need to be generated. Usually one element of the output of
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The output of \code{\link{data_get}}.}
 
-\item{scale}{<\code{character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> Current scale. The output of}
 
 \item{col}{<\code{character}> Which column of \code{data} should be selected to grab the
 value information. Defaults to \code{var_left}, but could also be \code{var_right} or
@@ -67,8 +69,7 @@ A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$t
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
-\item{data_path}{<\code{character}> A string representing the path to the
-directory containing the QS files. Default is "data/".}
+\item{region}{<\code{character}> String of the region under study}
 
 \item{lang}{<\code{character}> Active language. \code{"en"} or \code{"fr"}}
 }

@@ -14,27 +14,27 @@ data_get(vars, scale, region, variables, ...)
 
 \method{data_get}{q5}(vars, scale, region = NULL, variables, vl_vr = "var_left", ...)
 
-\method{data_get}{bivar}(vars, scale, region, schemas, ...)
+\method{data_get}{bivar}(vars, scale, region, variables, schemas, ...)
 
-\method{data_get}{delta}(vars, scale, region, time, ...)
+\method{data_get}{delta}(vars, scale, region, variables, time, ...)
 
-\method{data_get}{delta_bivar}(vars, scale, region, time, ...)
+\method{data_get}{delta_bivar}(vars, scale, region, variables, time, ...)
 
-\method{data_get}{bivar_ldelta_rq3}(vars, scale, region, time, ...)
+\method{data_get}{bivar_ldelta_rq3}(vars, scale, region, variables, time, ...)
 
-\method{data_get}{default}(vars, scale, region = NULL, vr_vl, ...)
+\method{data_get}{default}(vars, scale, region, variables, vr_vl, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> Named list with a class. Object built using the
 \code{\link{vars_build}} function. The class of the vars object is
 used to determine how to grab de data and output it.}
 
-\item{scale}{<\code{character}> The scale of the data to be retrieved, e.g. \code{CSD}.
-The output of \code{\link{update_scale}}.}
+\item{scale}{<\code{character}> The scale of the data to be retrieved, e.g. \code{CSD}.}
 
-\item{region}{<\verb{character vector}> A vector of IDs with which to filter the
-retrieved data for a specific region, probably retrieved from
-\code{regions_dictionary$scales}.}
+\item{region}{<\verb{character vector}> Character of the region under study}
+
+\item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
+both var_left and var_right, and any potential parent variable aswell.}
 
 \item{...}{Additional arguments passed to methods.}
 
@@ -61,8 +61,6 @@ methods will be used to retrieve and process the data.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data_get(q5)}: The method for q5.
-
 \item \code{data_get(bivar)}: The method for bivar.
 
 \item \code{data_get(delta)}: The method for delta.

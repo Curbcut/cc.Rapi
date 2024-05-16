@@ -6,6 +6,7 @@
 \usage{
 explore_text_check_na(
   context,
+  variables,
   data,
   select_id,
   vars,

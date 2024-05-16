@@ -16,15 +16,13 @@
 #' value information. Defaults to `var_left`, but could also be `var_right`.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #' @param ... Additional arguments to pass to specific method functions.
 #'
 #' @return Varies based on the method specified in \code{var}. Commonly
 #' returns a list with elements like \code{val} and \code{count}.
 #' @export
 region_value <- function(var, data, time, scale, region, select_id, col, schemas = NULL,
-                         data_path, variables, ...) {
+                         variables, ...) {
   # Get the parent variable data
   rv <- region_value_data_grab(
     var = var, data = data, time = time, col = col,
@@ -156,15 +154,12 @@ region_value_method.default <- function(var, data_vals, parent_vals, ...) {
 #' @param time <`numeric`> The time period of interest.
 #' @param scale <`character`> The scale of interest.
 #' @param region  <`character`> The region of interest.
-#' @param data_path <`character`> The path to the data directory, defaults to
 #' "data/".
 #' @param col <`character`> Which column of `data` should be selected to grab the
 #' value information. Defaults to `var_left`, but could also be `var_right` or
 #' `var_left_1` in delta.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #'
 #' @return Returns a list containing two elements: \code{data_vals}, which
 #' holds the data values for the specified variable, and \code{parent_vals},

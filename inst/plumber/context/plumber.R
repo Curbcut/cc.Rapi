@@ -2,11 +2,7 @@
 future::plan("multisession")
 
 # Initialize database pool
-db_pool <- db_connection()
-
-# Ensure the pool is closed when the R session ends
-on.exit(pool::poolClose(db_pool), add = TRUE)
-
+db_pool <<- cc.Rapi::db_connection()
 
 #* Echo back the input
 #* @param var_left etc
@@ -15,12 +11,18 @@ on.exit(pool::poolClose(db_pool), add = TRUE)
 #* @param region etc
 #* @param time etc
 #* @param select_id etc
-#* @get /echo
-function(var_left, var_right = " ", scale, region = NULL, time, select_id,
-         lang = NULL, schemas = list(var_left = list(time = time), var_right = list(time = time))) {
+#* @get /context
+function(var_left, var_right = " ", scale, region, time, select_id = NA,
+         lang = NULL,
+         schemas = jsonlite::toJSON(
+           list(var_left = list(time = time), var_right = list(time = time)))) {
+  schemas <- jsonlite::fromJSON(schemas)
+
   promises::future_promise({
-    context(var_left = var_left, var_right = var_right, scale = scale,
-            region = region, time = time, select_id = select_id,
-            lang = lang, schemas = schemas)
+    # Just make sure the pool is in the environment
+    db_pool
+    cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
+                     region = region, time = time, select_id = select_id,
+                     lang = lang, schemas = schemas)
   })
 }

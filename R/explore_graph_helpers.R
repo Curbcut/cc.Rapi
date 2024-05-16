@@ -10,7 +10,6 @@
 #' @param lang <`character`> A character string indicating the language to
 #' translate variable titles to.
 #' @param scale <`reactive character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param scales_as_DA <`character vector`> A character vector of `scales`
 #' that should be handled as a "DA" scale, e.g. `building` and `street`. By default,
 #' their graph will be the one of their DA.
@@ -65,7 +64,7 @@ explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NU
 #' visualize overlapping points. The jitter effect is dependent on the
 #' proportion of unique values to total observations in the data.
 #'
-#' @param dat <`data.frame`> A data frame or tibble object that contains the data.
+#' @param dat <`data.frame`> A data frame  that contains the data.
 #' @param cols <`character vector`> A character vector of length 2 specifying the
 #' column names of 'dat' that will be used for the x and y coordinates, respectively.
 #'

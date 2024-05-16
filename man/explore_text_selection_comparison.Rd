@@ -6,6 +6,7 @@
 \usage{
 explore_text_selection_comparison(
   var = NULL,
+  variables,
   data,
   select_id,
   col = "var_left",

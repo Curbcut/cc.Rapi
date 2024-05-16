@@ -9,7 +9,7 @@ explore_context(
   select_id,
   scale,
   switch_DA,
-  zoom_levels,
+  top_scale,
   shown_scale = NULL,
   lang = NULL
 )
@@ -22,15 +22,14 @@ retrieve, e.g. \code{CMA}. Usually equivalent of \code{r$region()}.}
 \code{r[[id]]$select_id()}. If there is a selection (select_id is not NA), the
 name of the selected polygon will appear.}
 
-\item{scale}{<\verb{reactive character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\verb{reactive character}> Current scale. The output of}
 
 \item{switch_DA}{<\code{logical}> Is the \code{df} part of the scales that should be
 switched as DAs instead.}
 
-\item{zoom_levels}{<\verb{named numeric vector}> A named numeric vector of zoom
-levels. Usually one of the \verb{mzl_*}, or the output of
-\code{\link{geography_server}}.}
+\item{top_scale}{<\code{character}> The current top scale. When there are no name_2
+in a small scale (DA), the name of the feature of the top scale in which the
+DA fall will be used as context. e.g. DA 490543 (Le Plateau Mont-Royal).}
 
 \item{shown_scale}{<\code{character}> While the \code{scale} argument is the scale
 for which to calculate regional values, \code{shown_scale} is the scale which

@@ -12,6 +12,8 @@ retrieve data from. Single variable = single table. e.g. \code{housing_tenant}}
 
 \item{scale}{<\code{character}> A string specifying the scale at which to retrieve
 data, corresponding to a path on disk, e.g. \code{DA} or \code{CSD}.}
+
+\item{region}{<\code{character}> String of the region under study.}
 }
 \value{
 A data.frame object with the selected data from the specified table.

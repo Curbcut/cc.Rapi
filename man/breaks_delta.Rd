@@ -10,8 +10,7 @@ breaks_delta(vars, scale = NULL, character = FALSE, data = NULL)
 \item{vars}{<\verb{named list}> A list object with a pre-determined class. The
 output of \code{\link{vars_build}}.}
 
-\item{scale}{<\code{character}> The scale at which the user is on. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> The scale at which the user is on. The output of}
 
 \item{character}{<\code{logical}>, if \code{TRUE}, the breaks are returned as characters.}
 

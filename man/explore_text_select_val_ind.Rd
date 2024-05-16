@@ -8,6 +8,7 @@
 \usage{
 explore_text_select_val_ind(
   var,
+  variables,
   data,
   select_id,
   col = "var_left",
@@ -20,6 +21,7 @@ explore_text_select_val_ind(
 
 \method{explore_text_select_val_ind}{scalar}(
   var,
+  variables,
   data,
   select_id,
   col = "var_left",
@@ -32,6 +34,7 @@ explore_text_select_val_ind(
 
 \method{explore_text_select_val_ind}{ordinal}(
   var,
+  variables,
   data,
   select_id,
   col = "var_left",

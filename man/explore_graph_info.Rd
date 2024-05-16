@@ -26,8 +26,7 @@ plot, default is "acidgrotesk-book".}
 \item{lang}{<\code{character}> A character string indicating the language to
 translate variable titles to.}
 
-\item{scale}{<\verb{reactive character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\verb{reactive character}> Current scale. The output of}
 
 \item{select_id}{<\code{character}> A string indicating the ID of the currently
 selected region (if any). Usually \code{r[[id]]$select_id()}}

@@ -10,7 +10,6 @@
 #' `r[[id]]$select_id()`. If there is a selection (select_id is not NA), the
 #' name of the selected polygon will appear.
 #' @param scale <`reactive character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param switch_DA <`logical`> Is the `df` part of the scales that should be
 #' switched as DAs instead.
 #' @param top_scale <`character`> The current top scale. When there are no name_2
@@ -67,7 +66,7 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
   if (is.na(name_2)) {
     name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "ID" = (
                           SELECT "%s_ID" FROM %s."%s" WHERE "ID" = \'%s\')',
-                          schema, top_scale, top_scale, schema, scale, select_id))$name
+                          "mtl", top_scale, top_scale, "mtl", scale, select_id))$name
   }
   name_2 <- cc_t(name_2, lang = lang)
   heading <- cc_t(scale_df$place_heading, lang = lang)
@@ -147,12 +146,9 @@ explore_text_parent_title <- function(var, variables, lang = NULL) {
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param ... Additional arguments for the \code{\link{explore_text_select_val}}
 #' @param scale <`reactive character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param data <`data.frame`> The output of \code{\link{data_get}}.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #'
 #' @return The resulting data frame after subsetting or list when there is a
 #' selection.
@@ -201,17 +197,18 @@ explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
 #' value information. Defaults to `var_left`, but could also be `var_right` or
 #' `var_left_1` in delta.
 #' @param time_col <`numeric`> Time at which to show the data.
-#' @param data_path <`character`> A string representing the path to the
 #' directory containing the QS files. Default is "data/".
+#' @param region <`character`> Character string specifying the name of the region.
+#' Usually equivalent of `r$region()`.
 #'
 #' @return A vector containing the parent value for the zone.
 explore_get_parent_data <- function(var, variables, select_id, scale, col = "var_left",
-                                    time_col, data_path) {
+                                    time_col, region) {
   # Get the parent string
   parent_string <- var_get_info(var = var, variables = variables, what = "parent_vec")
 
   vars <- vars_build(var_left = parent_string, scale = scale, variables = variables,
-                     time = time$var_left)$vars
+                     time = time_col)$vars
   parent_data <- data_get(
     vars = vars, scale = scale, region = region, vr_vl = col,
     variables = variables
@@ -239,7 +236,6 @@ explore_get_parent_data <- function(var, variables, select_id, scale, col = "var
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
 #' @param scale <`character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param time <`numeric named list`> The `time` at which data is displayed.
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param col <`character`> Which column of `data` should be selected to grab the
@@ -256,11 +252,10 @@ explore_text_select_val <- function(var, variables, ...) {
 }
 
 #' @describeIn explore_text_select_val Method for pct
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
+#' @param region <`character`> String of the region under study
 #' @export
 explore_text_select_val.pct <- function(var, variables, select_id, data, scale, col = "var_left",
-                                        time, schemas = NULL, data_path, ...) {
+                                        time, schemas = NULL, region, ...) {
   # Create empty vector
   out <- c()
 
@@ -277,8 +272,7 @@ explore_text_select_val.pct <- function(var, variables, select_id, data, scale, 
   # Get the parent data
   all_count <- explore_get_parent_data(
     var = var, variables = variables, select_id = select_id,
-    scale = scale, time_col = time[[col]],
-    data_path = data_path
+    scale = scale, time_col = time[[col]], region = region
   )
 
   # Multiply the percentage by the count of parent in the zone

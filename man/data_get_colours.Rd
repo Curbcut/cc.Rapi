@@ -10,82 +10,19 @@
 \alias{data_get_colours.default}
 \title{Retrieve colors for all IDs of a specified region}
 \usage{
-data_get_colours(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+data_get_colours(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{q5}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{q5}(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{bivar}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{bivar}(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{delta}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{delta}(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{delta_bivar}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{delta_bivar}(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{bivar_ldelta_rq3}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{bivar_ldelta_rq3}(vars, region, time, zoom_levels, variables, schemas, ...)
 
-\method{data_get_colours}{default}(
-  vars,
-  region,
-  time,
-  zoom_levels,
-  scales_as_DA = c("building", "street"),
-  schemas,
-  data_path = get_data_path(),
-  ...
-)
+\method{data_get_colours}{default}(vars, region, time, zoom_levels, variables, schemas, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> Named list with a class. Object built using the
@@ -93,26 +30,21 @@ data_get_colours(
 
 \item{region}{<\code{character}> Region for which to get the \code{map_zoom_levels} and
 retrieve all the according colours of all the IDs. One of the regions available
-in the \code{regions_dictionary}. Usually one of the output of \code{\link{geography_server}}.}
+in the \code{regions_dictionary}.}
 
 \item{time}{<\verb{numeric named list}> The \code{time} at which data is displayed.
 A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.}
 
 \item{zoom_levels}{<\verb{named numeric vector}> A named numeric vector of zoom
-levels. Usually one of the \verb{mzl_*}, or the output of
-\code{\link{geography_server}}. It needs to be \code{numeric} as the function
+levels. It needs to be \code{numeric} as the function
 will sort them to make sure the lower zoom level is first, and the highest
 is last (so it makes sense on an auto-scale).}
 
-\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales} that
-should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
-their colour will be the one of their DA.}
+\item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
+both var_left and var_right, and any potential parent variable aswell.}
 
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
-
-\item{data_path}{<\code{character}> A string representing the path to the
-directory containing the QS files. Default is "data/".}
 
 \item{...}{Additional arguments passed to methods.}
 }

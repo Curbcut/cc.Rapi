@@ -6,7 +6,6 @@
 #' @param vars <`named list`> A list object with a pre-determined class. The
 #' output of \code{\link{vars_build}}.
 #' @param scale <`character`> The scale at which the user is on. The output of
-#' \code{\link{update_scale}}.
 #' @param character <`logical`>, if `TRUE`, the breaks are returned as characters.
 #' @param data <`data.frame`> Optional, a data frame to use instead of recovering it
 #' from the file.
@@ -319,6 +318,8 @@ use_quantiles <- function(data_vec) {
 #' Default is "q5".
 #' @param rename_col <`character`> The column name to rename. Default is
 #' "var_left". Can also be "var_right".
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
 #'
 #' @return <`data.frame`> Modified data frame with additional columns.
 data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
@@ -375,7 +376,7 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   out <- as.data.frame(lapply(data_val, .bincode, assemble_breaks, include.lowest = TRUE))
   out <- stats::setNames(out, sprintf("%s_%s", names(data_val), q3_q5))
   data <- cbind(data, out) # bind the data
-  data <- tibble::as_tibble(data)
+  data <- data.frame(data)
   attr(data, sprintf("breaks_%s", rename_col)) <- breaks
 
   # Rename attributes so it's clearly assigned on var_left or var_right

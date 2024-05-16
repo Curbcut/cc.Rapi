@@ -10,7 +10,6 @@
 #' Usually equivalent of `r$region()`.
 #' @param data <`data.frame`> The output of \code{\link{data_get}}.
 #' @param scale <`character`> Current scale. The output of
-#' \code{\link{update_scale}}.
 #' @param select_id <`character`> the current selected ID, usually
 #' `r[[id]]$select_id()`.
 #' @param col <`character`> Which column of `data` should be selected to grab the
@@ -22,8 +21,6 @@
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #' @param ... Additional arguments passed to the function..
 #'
 #' @return The resulting text.
@@ -58,7 +55,6 @@ explore_text_values_q5.pct <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     variables = variables,
     ...
   )
@@ -116,7 +112,6 @@ explore_text_values_q5.count <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 
@@ -165,7 +160,6 @@ explore_text_values_q5.dollar <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 
@@ -222,7 +216,6 @@ explore_text_values_q5.ind <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 
@@ -312,7 +305,6 @@ explore_text_values_q5.avg <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 
@@ -386,7 +378,6 @@ explore_text_values_q5.sqkm <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 
@@ -431,7 +422,7 @@ explore_text_values_q5.per1k <- function(var, region,
                                          data, variables, scale, select_id,
                                          col = "var_left", lang, time, schemas = NULL, ...) {
   explore_text_values_q5.sqkm(
-    var = var, region = region, data_path = data_path, scale = scale, select_id = select_id,
+    var = var, region = region, scale = scale, select_id = select_id,
     data = data, col = col, lang = lang, time = time, ...
   )
 }
@@ -452,7 +443,6 @@ explore_text_values_q5.ppo <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
-    data_path = data_path,
     ...
   )
 

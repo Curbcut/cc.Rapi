@@ -16,7 +16,7 @@ explore_text(
   time,
   data,
   schemas,
-  zoom_levels,
+  top_scale,
   variables,
   lang = NULL,
   ...
@@ -30,7 +30,7 @@ explore_text(
   time,
   data,
   schemas,
-  zoom_levels,
+  top_scale,
   variables,
   lang = NULL,
   shown_scale = NULL,
@@ -46,7 +46,7 @@ explore_text(
   time,
   data,
   schemas,
-  zoom_levels,
+  top_scale,
   variables,
   lang = NULL,
   ...
@@ -60,7 +60,7 @@ explore_text(
   time,
   data,
   schemas,
-  zoom_levels,
+  top_scale,
   variables,
   lang = NULL,
   shown_scale = NULL,
@@ -76,7 +76,7 @@ explore_text(
   time,
   data,
   schemas,
-  zoom_levels,
+  top_scale,
   variables,
   lang = NULL,
   ...
@@ -92,8 +92,7 @@ Usually equivalent of \code{r$region()}.}
 \item{select_id}{<\code{character}> A string indicating the ID of the currently
 selected region (if any). Usually \code{r[[id]]$select_id()}}
 
-\item{scale}{<\verb{reactive character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\verb{reactive character}> Current scale. The output of}
 
 \item{time}{<\verb{numeric named list}> The \code{time} at which data is displayed.
 A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.}
@@ -104,9 +103,9 @@ observations. The output of \code{\link{data_get}}.}
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
-\item{zoom_levels}{<\verb{named numeric vector}> A named numeric vector of zoom
-levels. Usually one of the \verb{mzl_*}, or the output of
-\code{\link{geography_server}}.}
+\item{top_scale}{<\code{character}> The current top scale. When there are no name_2
+in a small scale (DA), the name of the feature of the top scale in which the
+DA fall will be used as context. e.g. Dissemination area 24520104 (Lavaltrie).}
 
 \item{lang}{<\code{character}> A string indicating the language in which to
 translates the variable. Defaults to NULL. Usually is \code{r$lang()}.}

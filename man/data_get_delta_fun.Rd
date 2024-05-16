@@ -6,11 +6,11 @@
 \alias{data_get_delta_fun.ordinal}
 \title{Inner function to get data based on the type of \code{vars}}
 \usage{
-data_get_delta_fun(vars, scale, region, time, ...)
+data_get_delta_fun(vars, scale, region, variables, time, ...)
 
-\method{data_get_delta_fun}{scalar}(vars, scale, region, time, ...)
+\method{data_get_delta_fun}{scalar}(vars, scale, region, variables, time, ...)
 
-\method{data_get_delta_fun}{ordinal}(vars, scale, region, time, ...)
+\method{data_get_delta_fun}{ordinal}(vars, scale, region, variables, time, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> Named list with a class. Object built using the
@@ -18,9 +18,10 @@ data_get_delta_fun(vars, scale, region, time, ...)
 
 \item{scale}{<\code{character}> The scale at which the user is on.}
 
-\item{region}{<\verb{character vector}> A vector of IDs with which to filter the
-retrieved data for a specific region, probably retrieved from
-\code{regions_dictionary$scales}.}
+\item{region}{<\verb{character vector}> String of the region under study}
+
+\item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
+both var_left and var_right, and any potential parent variable aswell.}
 
 \item{time}{<\verb{named list}> Object built using the \code{\link{vars_build}}
 function. It contains the time for both var_left and var_right variables.}

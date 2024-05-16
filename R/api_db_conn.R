@@ -1,4 +1,10 @@
-# Function to initialize the database connection
+#' Establish a Database Connection Pool
+#'
+#' This function creates a database connection pool using the `pool` package
+#' and connects to the prod PostgreSQL database using environment variables for
+#' configuration.
+#'
+#' @return <`DBI::dbPool`> A database connection pool object.
 #' @export
 db_connection <- function() {
   pool::dbPool(RPostgres::Postgres(),

@@ -12,19 +12,11 @@
 \alias{explore_text_values_q5.ppo}
 \title{Generate text for the given variables and region - q5 version}
 \usage{
-explore_text_values_q5(
-  var,
-  region,
-  data_path = get_data_path(),
-  data,
-  variables,
-  ...
-)
+explore_text_values_q5(var, region, data, variables, ...)
 
 \method{explore_text_values_q5}{pct}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -39,7 +31,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{count}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -54,7 +45,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{dollar}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -69,7 +59,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{ind}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -84,7 +73,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{avg}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -99,7 +87,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{sqkm}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -114,7 +101,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{per1k}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -129,7 +115,6 @@ explore_text_values_q5(
 \method{explore_text_values_q5}{ppo}(
   var,
   region,
-  data_path = get_data_path(),
   data,
   variables,
   scale,
@@ -148,15 +133,11 @@ generated. Usually \code{vars$var_left}}
 \item{region}{<\code{character}> Character string specifying the name of the region.
 Usually equivalent of \code{r$region()}.}
 
-\item{data_path}{<\code{character}> A string representing the path to the
-directory containing the QS files. Default is "data/".}
-
 \item{data}{<\code{data.frame}> The output of \code{\link{data_get}}.}
 
 \item{...}{Additional arguments passed to the function..}
 
-\item{scale}{<\code{character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> Current scale. The output of}
 
 \item{select_id}{<\code{character}> the current selected ID, usually
 \code{r[[id]]$select_id()}.}

@@ -223,39 +223,36 @@ s_sentence <- function(x) {
   return(capitalized_string)
 }
 
-#' Retrieve the `colours_dfs` object
+#' Build color palettes for data visualization
 #'
-#' This function temporarily creates the `colours_dfs`.
-#' The `colours_dfs` object contains pre-defined color schemes that can be used
-#' in various plots across the package.
+#' This function generates a set of color palettes for data visualization
+#' purposes. It returns a list containing six data frames that can be used
+#' for setting color scales in rdeck, ggplot or other visualization packages.
 #'
-#' @return The `colours` object created from cc.buildr, TEMPORARILY
-colours_get <- #' Build color palettes for data visualization
-  #'
-  #' This function generates a set of color palettes for data visualization
-  #' purposes. It returns a list containing six data frames that can be used
-  #' for setting color scales in rdeck, ggplot or other visualization packages.
-  #'
-  #' @param left_5 <`colours vector`> for a sequential scale of 5 values
-  #' for the left side of the color scale.
-  #' @param left_3 <`colours vector`> for a sequential scale of 3 values
-  #' for the left side of the color scale.
-  #' @param right_5 <`colours vector`> for a sequential scale of 5 values
-  #' for the right side of the color scale.
+#' @param left_5 <`colours vector`> for a sequential scale of 5 values
+#' for the left side of the color scale.
+#' @param left_3 <`colours vector`> for a sequential scale of 3 values
+#' for the left side of the color scale.
+#' @param right_5 <`colours vector`> for a sequential scale of 5 values
+#' for the right side of the color scale.
 #' @param right_3 <`colours vector`> for a sequential scale of 3 values
 #' for the right side of the color scale.
 #' @param delta_5 <`colours vector`> scale used for variation of 5 values.
 #' By defaults starts with red and go to blue.
+#' @param delta_neg_5 <`colours vector`> scale used only when a delta only shows
+#' negative values. Default choses using the first and second color of `delta_5`.
+#' @param delta_pos_5 <`colours vector`>  scale used only when a delta only shows
+#' positive values. Default choses using the fourth and fifth color of `delta_5`.
 #' @param bivar <`colours vector`> for a bivariate scale of 9 values, by default
 #' the stevens.greenblue palette.
 #' @param qual <`colours vector`> for a qualitative scale of 6 values.
 #' @param col_NA <`colours vector`> for missing values.
 #' @param viridis <`colours vector`> for a viridis color scale.
 #'
-#' @return A list of tibbles with color scales to be used for the rdeck map,
+#' @return A list of data.frame with color scales to be used for the rdeck map,
 #' legend and other plots.
 #' @export
-build_colours <- function(
+colours_get <- function(
     left_5 = c("#C4CDE1", "#98A8CB", "#6C83B5", "#4C5C7F", "#2B3448"),
     left_3 = c("#E8E8E8", "#B5C0DA", "#6C83B5"),
     right_5 = c("#C7DFCC", "#9DC6A6", "#73AE80", "#517A5A", "#2E4633"),
@@ -275,37 +272,37 @@ build_colours <- function(
     viridis = scales::viridis_pal()(25)) {
   # rdeck colours -----------------------------------------------------------
 
-  c_NA <- tibble::tibble(
+  c_NA <- data.frame(
     palette = "NA",
     group = "0",
     value = col_NA
   )
 
-  c_q5 <- tibble::tibble(
+  c_q5 <- data.frame(
     palette = "q5",
     group = as.character(1:5),
     value = left_5
   )
 
-  c_bivar <- tibble::tibble(
+  c_bivar <- data.frame(
     palette = "bivar",
     group = as.character(6:14),
     value = bivar
   )
 
-  c_delta <- tibble::tibble(
+  c_delta <- data.frame(
     palette = "delta",
     group = as.character(15:19),
     value = delta_5
   )
 
-  c_qual <- tibble::tibble(
+  c_qual <- data.frame(
     palette = "qual",
     group = as.character(20:25),
     value = qual
   )
 
-  c_viridis <- tibble::tibble(
+  c_viridis <- data.frame(
     palette = "viridis",
     group = as.character(26:50),
     value = viridis
@@ -318,7 +315,7 @@ build_colours <- function(
   # Other -------------------------------------------------------------------
 
   left_5 <-
-    tibble::tibble(
+    data.frame(
       group = c(0:5, "NA"),
       y = 1,
       fill = c(col_NA, left_5, col_NA)
@@ -326,7 +323,7 @@ build_colours <- function(
 
   bivar_colors <- c(bivar, rep(col_NA, 7))
   bivar <-
-    tibble::tibble(
+    data.frame(
       group = c(
         "1 - 1", "2 - 1", "3 - 1",
         "1 - 2", "2 - 2", "3 - 2",
@@ -343,33 +340,33 @@ build_colours <- function(
       fill = c(bivar, rep(col_NA, 7))
     )
 
-  delta <- tibble::tibble(
+  delta <- data.frame(
     group = c(1:5, "NA"),
     y = 1,
     fill = c(delta_5, col_NA)
   )
 
-  delta_neg <- tibble::tibble(
+  delta_neg <- data.frame(
     group = c(1:5, "NA"),
     y = 1,
     fill = c(delta_neg_5, col_NA)
   )
 
-  delta_pos  <- tibble::tibble(
+  delta_pos  <- data.frame(
     group = c(1:5, "NA"),
     y = 1,
     fill = c(delta_pos_5, col_NA)
   )
 
-  qual <- tibble::tibble(
+  qual <- data.frame(
     group = as.character(seq_along(qual) - 1),
     y = 1,
     fill = qual
   )
 
-  variant_5 <- tibble::tibble(group = as.character(1:5), y = 1, fill = right_5)
+  variant_5 <- data.frame(group = as.character(1:5), y = 1, fill = right_5)
 
-  viridis <- tibble::tibble(
+  viridis <- data.frame(
     group = as.character(1:10), y = 1,
     fill = scales::viridis_pal()(10)
   )
@@ -871,36 +868,6 @@ match_schema_to_z_col <- function(data, time, col, vl_vr,
 in_prod <- function() {
   !grepl("(/curbcut$)|(/curbcut/tests/testthat$)|(curbcut.Rcheck/tests/testthat)",
          getwd())
-}
-
-#' Get the data path for Curbcut
-#'
-#' This function retrieves the data path for testing purposes. It looks for the
-#' environment variable `CURBCUT_DATA` and should return a path to a Curbcut
-#' data folder if it exists. If the environment variable is not set, which is
-#' what happened in production, it returns "data/" as a fallback.
-#'
-#' @return A character string representing the path where data is stored.
-#' @export
-get_data_path <- function() {
-  # Are you in the `curbcut` repo developping?
-  cc_repo <- !in_prod()
-
-  # If not, return data/ as default
-  if (!cc_repo) {
-    return("data/")
-  }
-
-  # Retrieve the value of the CURBCUT_DATA environment variable
-  data_path <- Sys.getenv("CURBCUT_DATA")
-
-  # Check if the environment variable is empty
-  if (data_path == "") {
-    return("data/")
-  }
-
-  # Return the data path
-  return(data_path)
 }
 
 #' Filter Rows Based on a Column Value Range

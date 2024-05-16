@@ -6,11 +6,12 @@
 \usage{
 explore_get_parent_data(
   var,
+  variables,
   select_id,
   scale,
   col = "var_left",
   time_col,
-  data_path
+  region
 )
 }
 \arguments{
@@ -26,10 +27,11 @@ retrieve the parent data.}
 value information. Defaults to \code{var_left}, but could also be \code{var_right} or
 \code{var_left_1} in delta.}
 
-\item{time_col}{<\code{numeric}> Time at which to show the data.}
-
-\item{data_path}{<\code{character}> A string representing the path to the
+\item{time_col}{<\code{numeric}> Time at which to show the data.
 directory containing the QS files. Default is "data/".}
+
+\item{region}{<\code{character}> Character string specifying the name of the region.
+Usually equivalent of \code{r$region()}.}
 }
 \value{
 A vector containing the parent value for the zone.

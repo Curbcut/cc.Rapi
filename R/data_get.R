@@ -8,13 +8,14 @@
 #' retrieve data from. Single variable = single table. e.g. `housing_tenant`
 #' @param scale <`character`> A string specifying the scale at which to retrieve
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
+#' @param region <`character`> String of the region under study.
 #'
 #' @return A data.frame object with the selected data from the specified table.
 data_get_qs <- function(var, scale, region) {
-  query <- sprintf(sprintf('SELECT * FROM %s.\"%s_%s\" WHERE "ID" IN (
+  query <- sprintf('SELECT * FROM %s.\"%s_%s\" WHERE "ID" IN (
         SELECT jsonb_array_elements_text("scales"->\'%s\')::text
         FROM "%s".regions_dictionary WHERE "region" = \'%s\')',
-        schema, scale, var, scale, schema, region))
+        "mtl", scale, var, scale, "mtl", region)
   db_get_helper(query)
 }
 
@@ -28,6 +29,9 @@ data_get_qs <- function(var, scale, region) {
 #' two years for which the delta should be calculated.
 #' @param scale <`character`> A string specifying the scale at which to retrieve
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
+#' @param region <`character`> String of the region under study.
 #' @param vl_vr <`character`> Which of var_left or var_right is this delta supposed
 #' to be for. Defaults to var_left.
 #'
@@ -35,7 +39,7 @@ data_get_qs <- function(var, scale, region) {
 #' `ID` is the ID column from the original data, `var_1` and `var_2` are the
 #' values of the two variables being compared, and `var` is the percentage
 #' change between the two variables.
-data_get_delta <- function(vars, time, scale, vl_vr = "var_left") {
+data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_left") {
   # Grab the correct var/time
   var <- vars[[vl_vr]]
   time_col <- time[[vl_vr]]
@@ -53,7 +57,8 @@ data_get_delta <- function(vars, time, scale, vl_vr = "var_left") {
     var = var,
     data = data,
     q3_q5 = "q5",
-    rename_col = vl_vr
+    rename_col = vl_vr,
+    variables = variables
   )
   data <- data$data
 
@@ -89,10 +94,9 @@ data_get_delta <- function(vars, time, scale, vl_vr = "var_left") {
 #' \code{\link{vars_build}} function. The class of the vars object is
 #' used to determine how to grab de data and output it.
 #' @param scale <`character`> The scale of the data to be retrieved, e.g. `CSD`.
-#' The output of \code{\link{update_scale}}.
-#' @param region <`character vector`> A vector of IDs with which to filter the
-#' retrieved data for a specific region, probably retrieved from
-#' `regions_dictionary$scales`.
+#' @param region <`character vector`> Character of the region under study
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A dataframe containing the data according to the class of `vars`,
@@ -104,7 +108,7 @@ data_get <- function(vars, scale, region, variables, ...) {
 }
 
 #' @describeIn data_get The method for q5.
-#' @param vr_vl <`character`> Is the parent data coming from the var_left
+#' @param vl_vr <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
 #' @export
 data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left", ...) {
@@ -128,13 +132,13 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
-data_get.bivar <- function(vars, scale, region, schemas, ...) {
+data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
   # Get var_left and var_right data
   vl <- data_get_qs(vars$var_left, scale = scale, region = region)
 
   # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale)) {
-    return(tibble::tibble())
+    return(data.frame())
   }
   vr <- data_get_qs(vars$var_right, scale = scale, region = region)
 
@@ -154,7 +158,8 @@ data_get.bivar <- function(vars, scale, region, schemas, ...) {
     \(var, data, rename_col) {
       data_append_breaks(
         var = var, data = data, q3_q5 = "q3",
-        rename_col = rename_col
+        rename_col = rename_col,
+        variables = variables
       )
     }, c(vars$var_left, vars$var_right),
     list(vl, vr),
@@ -245,9 +250,9 @@ data_get.bivar <- function(vars, scale, region, schemas, ...) {
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @export
-data_get.delta <- function(vars, scale, region, time, ...) {
+data_get.delta <- function(vars, scale, region, variables, time, ...) {
   data_get_delta_fun(
-    vars = vars, scale = scale, region = region,
+    vars = vars, scale = scale, region = region, variables = variables,
     time = time, ...
   )
 }
@@ -260,27 +265,27 @@ data_get.delta <- function(vars, scale, region, time, ...) {
 #' @param vars <`named list`> Named list with a class. Object built using the
 #' \code{\link{vars_build}} function.
 #' @param scale <`character`> The scale at which the user is on.
-#' @param region <`character vector`> A vector of IDs with which to filter the
-#' retrieved data for a specific region, probably retrieved from
-#' `regions_dictionary$scales`.
+#' @param region <`character vector`> String of the region under study
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @seealso \code{\link{data_get.delta}}
-data_get_delta_fun <- function(vars, scale, region, time, ...) {
+data_get_delta_fun <- function(vars, scale, region, variables, time, ...) {
   UseMethod("data_get_delta_fun", vars)
 }
 
 #' @describeIn data_get_delta_fun The method for scalar variables.
-data_get_delta_fun.scalar <- function(vars, scale, region, time, ...) {
+data_get_delta_fun.scalar <- function(vars, scale, region, variables, time, ...) {
   # Treat certain scales as DA
   scale <- treat_to_DA(scale = scale)
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
-    scale = scale
+    scale = scale, variables = variables, region = region
   )
 
   # Is delta ONLY positive or ONLY negative? Inform which color scale to use
@@ -310,12 +315,12 @@ data_get_delta_fun.scalar <- function(vars, scale, region, time, ...) {
 }
 
 #' @describeIn data_get_delta_fun The method for ordinal variables.
-data_get_delta_fun.ordinal <- function(vars, scale, region, time, ...) {
+data_get_delta_fun.ordinal <- function(vars, scale, region, variables, time, ...) {
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
-    scale = scale
+    scale = scale, variables = variables, region = region
   )
 
   # Is delta ONLY positive or ONLY negative? Inform which color scale to use
@@ -350,16 +355,16 @@ data_get_delta_fun.ordinal <- function(vars, scale, region, time, ...) {
 
 #' @describeIn data_get The method for bivar.
 #' @export
-data_get.delta_bivar <- function(vars, scale, region, time, ...) {
+data_get.delta_bivar <- function(vars, scale, region, variables, time, ...) {
 
   # Retrieve
   data_vl <- data_get_delta(
     vars = vars, time = time, vl_vr = "var_left",
-    scale = scale
+    scale = scale, variables = variables, region = region
   )
   data_vr <- data_get_delta(
     vars = vars, time = time, vl_vr = "var_right",
-    scale = scale
+    scale = scale, variables = variables, region = region
   )[-1]
 
   # Prepare for merge, keep attributes
@@ -390,7 +395,7 @@ data_get.delta_bivar <- function(vars, scale, region, time, ...) {
 
 #' @describeIn data_get The method for bivar_ldelta_rq3.
 #' @export
-data_get.bivar_ldelta_rq3 <- function(vars, scale, region, time, ...) {
+data_get.bivar_ldelta_rq3 <- function(vars, scale, region, variables, time, ...) {
   # Reconstruct vars for delta
   vl_vars <- vars_build(var_left = vars$var_left, scale = scale, time = time$var_left)
   vl_time <- vl_vars$time
@@ -441,7 +446,7 @@ data_get.bivar_ldelta_rq3 <- function(vars, scale, region, time, ...) {
 #' @param vr_vl <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
 #' @export
-data_get.default <- function(vars, scale, region = NULL, vr_vl, ...) {
+data_get.default <- function(vars, scale, region, variables, vr_vl, ...) {
   # Check if `vars` has been entered without being subset from `vars_build()`
   if (all(c("vars", "time") %in% names(vars))) {
     stop("`vars` is invalid. Subset `$vars` from the output of `vars_build()`.")

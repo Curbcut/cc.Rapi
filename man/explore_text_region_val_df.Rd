@@ -32,8 +32,7 @@ Usually equivalent of \code{r$region()}.}
 value information. Defaults to \code{var_left}, but could also be \code{var_right} or
 \code{var_left_1} in delta.}
 
-\item{scale}{<\verb{reactive character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\verb{reactive character}> Current scale. The output of}
 
 \item{data}{<\code{data.frame}> The output of \code{\link{data_get}}.}
 
@@ -47,9 +46,6 @@ A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$t
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
 \item{...}{Additional arguments for the \code{\link{explore_text_select_val}}}
-
-\item{data_path}{<\code{character}> A string representing the path to the
-directory containing the QS files. Default is "data/".}
 }
 \value{
 The resulting data frame after subsetting or list when there is a

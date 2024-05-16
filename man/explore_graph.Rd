@@ -123,8 +123,7 @@ output of \code{\link{vars_build}}.}
 \item{select_id}{<\code{character}> A string indicating the ID of the currently
 selected region (if any). Usually \code{r[[id]]$select_id()}}
 
-\item{scale}{<\code{character}> Current scale. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> Current scale. The output of}
 
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The output of \code{\link{data_get}}.}

@@ -7,7 +7,7 @@
 explore_graph_point_jitter(dat, cols, ...)
 }
 \arguments{
-\item{dat}{<\code{data.frame}> A data frame or tibble object that contains the data.}
+\item{dat}{<\code{data.frame}> A data frame  that contains the data.}
 
 \item{cols}{<\verb{character vector}> A character vector of length 2 specifying the
 column names of 'dat' that will be used for the x and y coordinates, respectively.}

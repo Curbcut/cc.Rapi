@@ -59,7 +59,7 @@ legend_labels.bivar_ldelta_rq3 <- function(vars, lang = NULL, variables, time, .
       var = vars$var_left, variables = variables, short_treshold = 12,
       translate = TRUE, lang = lang
     )
-  title_left <- legend_labels_delta_text(title = title_left, time_vrvl = time$var_left, variables = variables)
+  title_left <- legend_labels_delta_text(title = title_left, time_vrvl = time$var_left)
 
   title_right <-
     var_get_title(
@@ -90,7 +90,7 @@ legend_labels.delta <- function(vars, lang = NULL, variables, time, ...) {
       var = vars$var_left, variables = variables, short_treshold = 25,
       translate = TRUE, lang = lang
     )
-  title_left <- legend_labels_delta_text(title = title_left, time_vrvl = time$var_left, variables = variables)
+  title_left <- legend_labels_delta_text(title = title_left, time_vrvl = time$var_left)
 
   return(list(ggplot2::labs(x = title_left, y = NULL)))
 }
@@ -138,7 +138,7 @@ legend_labels.delta_bivar <- function(vars, lang = NULL, variables, time, ...) {
       var = vars$var_right, variables = variables, short_treshold = 12,
       translate = TRUE, lang = lang
     )
-  title_right <- legend_labels_delta_text(title = title_right, time_vrvl = time$var_right, variables = variables)
+  title_right <- legend_labels_delta_text(title = title_right, time_vrvl = time$var_right)
 
   title_left_short <- var_get_info(
     var = vars$var_left, variables = variables,

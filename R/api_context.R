@@ -7,10 +7,29 @@
 # schema <- "mtl"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))
-
 # db_pool <- db_connection()
 
-context <- function(conn, var_left, var_right = " ", scale, region = NULL, time, select_id,
+
+#' Generate Contextual Information for a Curbcut page
+#'
+#' This function generates contextual information such as legend, graph, and text
+#' for the application based on provided parameters. It fetches variables from
+#' the database, processes them, and then generates the necessary components
+#' for the application's context.
+#'
+#' @param var_left <`character`>
+#' @param var_right <`character`>
+#' @param scale <`character`>
+#' @param region <`character`>
+#' @param time <`character`>
+#' @param select_id <`character`>
+#' @param lang <`character vector`>
+#' @param top_scale <`character vector`>
+#' @param schemas <`list`>
+#'
+#' @return A list containing three components.
+#' @export
+context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
                     lang = NULL, top_scale, schemas = list(var_left = list(time = time),
                                                              var_right = list(time = time))) {
 
@@ -42,5 +61,37 @@ context <- function(conn, var_left, var_right = " ", scale, region = NULL, time,
                        data = data, time = time_formatted, schemas = schemas, lang = lang,
                        top_scale = top_scale, variables = variables)
 
-  return(list(legend = legend, graph = graph, text = text))
+
+  # Save the plot to a temporary file
+  legend_file <- tempfile(fileext = ".png")
+  ggplot2::ggsave(legend_file, plot = graph, device = "png")
+
+  # Save the plot to a temporary file
+  graph_file <- tempfile(fileext = ".png")
+  ggplot2::ggsave(graph_file, plot = graph, device = "png")
+
+  return(list(legend = base64enc::base64encode(legend_file),
+              graph = base64enc::base64encode(graph_file),
+              text = text))
+}
+
+
+#' Run Plumber API
+#'
+#' This function initializes and runs the Plumber API for the `cc.Rapi` package.
+#' It also sets up a hook to close the database pool when the API is stopped.
+#'
+#' @return This function does not return a value. It starts the Plumber API server.
+#' @export
+run_api <- function() {
+  api <- plumber::plumb_api("cc.Rapi", "context")
+
+  api$registerHooks(list(
+    exit = function() {
+      print("database pooling connection disconnected on exit")
+      pool::poolClose(get_from_globalenv("db_pool"))
+    }
+  ))
+
+  plumber::pr_run(api, port = 8000)
 }

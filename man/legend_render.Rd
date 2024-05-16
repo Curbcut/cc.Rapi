@@ -97,8 +97,7 @@ output of \code{\link{vars_build}}.}
 the legend (breaks, axis titles, ...). Defaults to \code{acidgrotesk-book}. To use
 the default font family og ggplot2, use \code{NULL}.}
 
-\item{scale}{<\code{character}> Scale under study. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> Scale under study.}
 
 \item{data}{<\code{data.frame}> The current data. The output of \code{\link{data_get}}.}
 

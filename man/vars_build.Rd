@@ -15,8 +15,7 @@ variable, e.g. \code{alp_2016} or \code{c("housing_tenant_2006", "housing_tenant
 compared variable, e.g. \code{housing_value}. Defaults to what no compared
 variable is represented by (" ").}
 
-\item{scale}{<\code{character}> Scale under study. The output of
-\code{\link{update_scale}}.}
+\item{scale}{<\code{character}> Scale under study.}
 
 \item{time}{<\verb{numeric vector}> The direct output of the \code{time} widget.}
 

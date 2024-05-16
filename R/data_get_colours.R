@@ -9,31 +9,25 @@
 #' \code{\link{vars_build}} function.
 #' @param region <`character`> Region for which to get the `map_zoom_levels` and
 #' retrieve all the according colours of all the IDs. One of the regions available
-#' in the `regions_dictionary`. Usually one of the output of \code{\link{geography_server}}.
+#' in the `regions_dictionary`.
 #' @param time <`numeric`> The `time` at which data is displayed. A subset of the list
 #' `time`. Only the numeric vector.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @param zoom_levels <`named numeric vector`> A named numeric vector of zoom
-#' levels. Usually one of the `mzl_*`, or the output of
-#' \code{\link{geography_server}}.
+#' levels.
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
 #' @param colours_table <`character`> Fromn which colour table should the colour
 #' be matched to the `group` column of the retrieved data. For `q5` class would be
 #' `left_5`, for `bivar` class would be `bivar`, etc. One of the names of the
 #' `colours_dfs` list present in the global environment.
-#' @param scales_as_DA <`character vector`> A character vector of `scales` that
-#' should be handled as a "DA" scale, e.g. `building` and `street`. By default,
-#' their colour will be the one of their DA.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A data frame with the columns \code{ID} and \code{fill} to use in
 #' an `cc.map::map_choropleth_fill_fun`-like scale function.
 data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_table,
-                                    schemas = NULL,
-                                    scales_as_DA = c("building", "street"),
-                                    data_path = get_data_path(), ...) {
+                                    variables, schemas = NULL, ...) {
   # Grab colours
   colours <- colours_get()
   if (!colours_table %in% names(colours)) {
@@ -44,13 +38,13 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
   }
 
   # Region and all possible `df`
-  dfs <- names(zoom_levels)[!names(zoom_levels) %in% scales_as_DA]
+  dfs <- names(zoom_levels)
   # Get all the data
-  data_r <- sapply(dfs, \(x) tryCatch(
-    data_get(vars,
-             scale = x, time = time, region = region,
-             data_path = data_path
-    ), error = function(e) tibble::tibble()),
+  data_r <- sapply(dfs, \(x) tryCatch({
+    warning("DO NOT DO THIS. SINGLE SQL CALL RETRIEVAL A CBIND OF ALL SCALES.")
+    data_get(vars, scale = x, time = time, region = region,
+             variables = variables)
+    }, error = function(e) data.frame()),
     simplify = FALSE,
     USE.NAMES = TRUE
   )
@@ -108,29 +102,24 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
 #' \code{\link{vars_build}} function.
 #' @param region <`character`> Region for which to get the `map_zoom_levels` and
 #' retrieve all the according colours of all the IDs. One of the regions available
-#' in the `regions_dictionary`. Usually one of the output of \code{\link{geography_server}}.
+#' in the `regions_dictionary`.
 #' @param time <`numeric named list`> The `time` at which data is displayed.
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param zoom_levels <`named numeric vector`> A named numeric vector of zoom
-#' levels. Usually one of the `mzl_*`, or the output of
-#' \code{\link{geography_server}}. It needs to be `numeric` as the function
+#' levels. It needs to be `numeric` as the function
 #' will sort them to make sure the lower zoom level is first, and the highest
 #' is last (so it makes sense on an auto-scale).
-#' @param scales_as_DA <`character vector`> A character vector of `scales` that
-#' should be handled as a "DA" scale, e.g. `building` and `street`. By default,
-#' their colour will be the one of their DA.
+#' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
+#' both var_left and var_right, and any potential parent variable aswell.
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
-#' @param data_path <`character`> A string representing the path to the
-#' directory containing the QS files. Default is "data/".
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A data frame with the columns \code{ID} and \code{fill} to use in
 #' an `cc.map::map_choropleth_fill_fun`-like scale function.
 #' @export
 data_get_colours <- function(vars, region, time, zoom_levels,
-                             scales_as_DA = c("building", "street"),
-                             schemas, data_path = get_data_path(), ...) {
+                             variables, schemas, ...) {
   UseMethod("data_get_colours", vars)
 }
 
@@ -138,12 +127,11 @@ data_get_colours <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.q5 <- function(vars, region, time, zoom_levels,
-                                scales_as_DA = c("building", "street"),
-                                schemas, data_path = get_data_path(), ...) {
+                                variables, schemas, ...) {
   data_get_colours_helper(
     vars = vars, region = region, time = time, schemas = schemas,
     zoom_levels = zoom_levels, colours_table = "left_5",
-    scales_as_DA = scales_as_DA, data_path = data_path
+    variables = variables
   )
 }
 
@@ -151,12 +139,11 @@ data_get_colours.q5 <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.bivar <- function(vars, region, time, zoom_levels,
-                                   scales_as_DA = c("building", "street"),
-                                   schemas, data_path = get_data_path(), ...) {
+                                   variables, schemas, ...) {
   data_get_colours_helper(
     vars = vars, region = region, time = time, schemas = schemas,
     zoom_levels = zoom_levels, colours_table = "bivar",
-    scales_as_DA = scales_as_DA, data_path = data_path
+    variables = variables
   )
 }
 
@@ -164,12 +151,11 @@ data_get_colours.bivar <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.delta <- function(vars, region, time, zoom_levels,
-                                   scales_as_DA = c("building", "street"),
-                                   schemas, data_path = get_data_path(), ...) {
+                                   variables, schemas, ...) {
   data_get_colours_helper(
     vars = vars, region = region, time = time, schemas = schemas,
     zoom_levels = zoom_levels, colours_table = "delta",
-    scales_as_DA = scales_as_DA, data_path = data_path
+    variables = variables
   )
 }
 
@@ -177,12 +163,11 @@ data_get_colours.delta <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.delta_bivar <- function(vars, region, time, zoom_levels,
-                                         scales_as_DA = c("building", "street"),
-                                         schemas, data_path = get_data_path(), ...) {
+                                         variables, schemas, ...) {
   data_get_colours_helper(
     vars = vars, region = region, time = time, schemas = schemas,
     zoom_levels = zoom_levels, colours_table = "bivar",
-    scales_as_DA = scales_as_DA, data_path = data_path
+    variables = variables
   )
 }
 
@@ -190,12 +175,11 @@ data_get_colours.delta_bivar <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.bivar_ldelta_rq3 <- function(vars, region, time, zoom_levels,
-                                              scales_as_DA = c("building", "street"),
-                                              schemas, data_path = get_data_path(), ...) {
+                                              variables, schemas, ...) {
   data_get_colours_helper(
     vars = vars, region = region, time = time, schemas = schemas,
     zoom_levels = zoom_levels, colours_table = "bivar",
-    scales_as_DA = scales_as_DA, data_path = data_path
+    variables = variables
   )
 }
 
@@ -203,8 +187,7 @@ data_get_colours.bivar_ldelta_rq3 <- function(vars, region, time, zoom_levels,
 #' @export
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.default <- function(vars, region, time, zoom_levels,
-                                     scales_as_DA = c("building", "street"),
-                                     schemas, data_path = get_data_path(), ...) {
+                                     variables, schemas, ...) {
   data <- data.frame(ID = "NA")
   data$fill <- "#B3B3BB"
   return(data)

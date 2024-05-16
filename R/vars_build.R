@@ -6,8 +6,7 @@
 #' @param var_right <`reactive character`> Character string of the selected
 #' compared variable, e.g. `housing_value`. Defaults to what no compared
 #' variable is represented by (" ").
-#' @param scale <`character`> Scale under study. The output of
-#' \code{\link{update_scale}}.
+#' @param scale <`character`> Scale under study.
 #' @param time <`numeric vector`> The direct output of the `time` widget.
 #' @param variables <`data.frame`> The `variables` df. Defaults to grabbing it
 #' from the global environment using \code{\link{get_from_globalenv}}.

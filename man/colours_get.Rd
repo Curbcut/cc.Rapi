@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{colours_get}
 \alias{colours_get}
-\title{Retrieve the \code{colours_dfs} object}
+\title{Build color palettes for data visualization}
 \usage{
 colours_get(
   left_5 = c("#C4CDE1", "#98A8CB", "#6C83B5", "#4C5C7F", "#2B3448"),
@@ -35,6 +35,12 @@ for the right side of the color scale.}
 \item{delta_5}{<\verb{colours vector}> scale used for variation of 5 values.
 By defaults starts with red and go to blue.}
 
+\item{delta_neg_5}{<\verb{colours vector}> scale used only when a delta only shows
+negative values. Default choses using the first and second color of \code{delta_5}.}
+
+\item{delta_pos_5}{<\verb{colours vector}>  scale used only when a delta only shows
+positive values. Default choses using the fourth and fifth color of \code{delta_5}.}
+
 \item{bivar}{<\verb{colours vector}> for a bivariate scale of 9 values, by default
 the stevens.greenblue palette.}
 
@@ -45,17 +51,11 @@ the stevens.greenblue palette.}
 \item{viridis}{<\verb{colours vector}> for a viridis color scale.}
 }
 \value{
-The \code{colours} object created from cc.buildr, TEMPORARILY
-
-This function generates a set of color palettes for data visualization
-purposes. It returns a list containing six data frames that can be used
-for setting color scales in rdeck, ggplot or other visualization packages.
-
-A list of tibbles with color scales to be used for the rdeck map,
+A list of data.frame with color scales to be used for the rdeck map,
 legend and other plots.
 }
 \description{
-This function temporarily creates the \code{colours_dfs}.
-The \code{colours_dfs} object contains pre-defined color schemes that can be used
-in various plots across the package.
+This function generates a set of color palettes for data visualization
+purposes. It returns a list containing six data frames that can be used
+for setting color scales in rdeck, ggplot or other visualization packages.
 }
