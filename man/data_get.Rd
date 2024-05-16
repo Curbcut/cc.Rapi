@@ -12,7 +12,7 @@
 \usage{
 data_get(vars, scale, region, variables, ...)
 
-\method{data_get}{q5}(vars, scale, region = NULL, variables, ...)
+\method{data_get}{q5}(vars, scale, region = NULL, variables, vl_vr = "var_left", ...)
 
 \method{data_get}{bivar}(vars, scale, region, schemas, ...)
 

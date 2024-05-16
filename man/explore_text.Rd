@@ -17,7 +17,7 @@ explore_text(
   data,
   schemas,
   zoom_levels,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   ...
 )
@@ -31,7 +31,7 @@ explore_text(
   data,
   schemas,
   zoom_levels,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   shown_scale = NULL,
   val = NULL,
@@ -47,7 +47,7 @@ explore_text(
   data,
   schemas,
   zoom_levels,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   ...
 )
@@ -61,7 +61,7 @@ explore_text(
   data,
   schemas,
   zoom_levels,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   shown_scale = NULL,
   val = NULL,
@@ -77,7 +77,7 @@ explore_text(
   data,
   schemas,
   zoom_levels,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   ...
 )
@@ -108,10 +108,6 @@ values that have an impact on which data column to pick. Usually \code{r[[id]]$s
 levels. Usually one of the \verb{mzl_*}, or the output of
 \code{\link{geography_server}}.}
 
-\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
-that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By
-default, their info will be the one of their DA.}
-
 \item{lang}{<\code{character}> A string indicating the language in which to
 translates the variable. Defaults to NULL. Usually is \code{r$lang()}.}
 
@@ -128,6 +124,10 @@ address of the grid cell. Defaults to NULL for normal operations.}
 data where we show region values for the highest resolution possible, but we still
 want to allow user to select grid cells of lower resolutions. Defaults to NULL
 for normal operations.}
+
+\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
+that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By
+default, their info will be the one of their DA.}
 }
 \value{
 The resulting text.

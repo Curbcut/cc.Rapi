@@ -12,13 +12,21 @@
 \alias{explore_text_values_q5.ppo}
 \title{Generate text for the given variables and region - q5 version}
 \usage{
-explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
+explore_text_values_q5(
+  var,
+  region,
+  data_path = get_data_path(),
+  data,
+  variables,
+  ...
+)
 
 \method{explore_text_values_q5}{pct}(
   var,
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -33,6 +41,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -47,6 +56,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -61,6 +71,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -75,6 +86,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -89,6 +101,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -103,6 +116,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",
@@ -117,6 +131,7 @@ explore_text_values_q5(var, region, data_path = get_data_path(), data, ...)
   region,
   data_path = get_data_path(),
   data,
+  variables,
   scale,
   select_id,
   col = "var_left",

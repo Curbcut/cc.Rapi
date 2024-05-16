@@ -12,7 +12,7 @@ region_value_data_grab(
   region,
   col,
   schemas = NULL,
-  data_path
+  variables
 )
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{explore_text_parent_title}
 \title{Get parent title of a variable}
 \usage{
-explore_text_parent_title(var, lang = NULL)
+explore_text_parent_title(var, variables, lang = NULL)
 }
 \arguments{
 \item{var}{<\code{character}> The variable name for which the parent title needs

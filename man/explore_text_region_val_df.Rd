@@ -14,7 +14,7 @@ explore_text_region_val_df(
   lang = NULL,
   time,
   schemas = NULL,
-  data_path = get_data_path(),
+  variables,
   ...
 )
 }
@@ -46,10 +46,10 @@ A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$t
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
+\item{...}{Additional arguments for the \code{\link{explore_text_select_val}}}
+
 \item{data_path}{<\code{character}> A string representing the path to the
 directory containing the QS files. Default is "data/".}
-
-\item{...}{Additional arguments for the \code{\link{explore_text_select_val}}}
 }
 \value{
 The resulting data frame after subsetting or list when there is a

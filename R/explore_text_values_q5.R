@@ -28,14 +28,14 @@
 #'
 #' @return The resulting text.
 #' @export
-explore_text_values_q5 <- function(var, region, data_path = get_data_path(), data,
+explore_text_values_q5 <- function(var, region, data,
                                    variables, ...) {
   UseMethod("explore_text_values_q5", var)
 }
 
 #' @describeIn explore_text_values_q5 The method for percentage values.
 #' @export
-explore_text_values_q5.pct <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.pct <- function(var, region,
                                        data, variables, scale, select_id,
                                        col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the parent variable
@@ -93,7 +93,7 @@ explore_text_values_q5.pct <- function(var, region, data_path = get_data_path(),
 
 #' @describeIn explore_text_values_q5 The method for count values.
 #' @export
-explore_text_values_q5.count <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.count <- function(var, region,
                                          data, variables, scale, select_id,
                                          col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the parent variable
@@ -151,7 +151,7 @@ explore_text_values_q5.count <- function(var, region, data_path = get_data_path(
 
 #' @describeIn explore_text_values_q5 The method for dollar values.
 #' @export
-explore_text_values_q5.dollar <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.dollar <- function(var, region,
                                           data, variables, scale, select_id,
                                           col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the region values
@@ -205,7 +205,7 @@ explore_text_values_q5.dollar <- function(var, region, data_path = get_data_path
 
 #' @describeIn explore_text_values_q5 The method for `ind` values.
 #' @export
-explore_text_values_q5.ind <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.ind <- function(var, region,
                                        data, variables, scale, select_id,
                                        col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the parent variable
@@ -295,7 +295,7 @@ explore_text_values_q5.ind <- function(var, region, data_path = get_data_path(),
 
 #' @describeIn explore_text_values_q5 The method for average values.
 #' @export
-explore_text_values_q5.avg <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.avg <- function(var, region,
                                        data, variables, scale, select_id,
                                        col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the parent variable
@@ -372,7 +372,7 @@ explore_text_values_q5.avg <- function(var, region, data_path = get_data_path(),
 
 #' @describeIn explore_text_values_q5 The method for square kilometers values.
 #' @export
-explore_text_values_q5.sqkm <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.sqkm <- function(var, region,
                                         data, variables, scale, select_id,
                                         col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the region values
@@ -427,7 +427,7 @@ explore_text_values_q5.sqkm <- function(var, region, data_path = get_data_path()
 
 #' @describeIn explore_text_values_q5 The method for per1k values.
 #' @export
-explore_text_values_q5.per1k <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.per1k <- function(var, region,
                                          data, variables, scale, select_id,
                                          col = "var_left", lang, time, schemas = NULL, ...) {
   explore_text_values_q5.sqkm(
@@ -438,7 +438,7 @@ explore_text_values_q5.per1k <- function(var, region, data_path = get_data_path(
 
 #' @describeIn explore_text_values_q5 The method for people per object values.
 #' @export
-explore_text_values_q5.ppo <- function(var, region, data_path = get_data_path(),
+explore_text_values_q5.ppo <- function(var, region,
                                        data, variables, scale, select_id,
                                        col = "var_left", lang, time, schemas = NULL, ...) {
   # Grab the region values

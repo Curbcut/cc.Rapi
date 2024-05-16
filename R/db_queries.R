@@ -42,7 +42,16 @@ db_operation <- function(what, args) {
 #' @return Returns the result set as a data frame.
 #' @export
 db_get_helper <- function(call) {
-  db_operation(DBI::dbGetQuery, args = call)
+  out <- db_operation(DBI::dbGetQuery, args = call)
+
+  # Switch JSON columns back to list
+  data_types <- sapply(out, class)
+  cols_json <- which(data_types == "pq_jsonb")
+  for (col in cols_json) {
+    out[[col]] <- sapply(out[[col]], \(x) list(jsonlite::fromJSON(x)), USE.NAMES = FALSE)
+  }
+
+  out
 }
 
 #' Retrieve Data from Database
@@ -91,15 +100,6 @@ db_get <- function(select, from, where = NULL, schema = get_from_globalenv("inst
 
   # Execute the query with the constructed SQL
   out <- db_get_helper(call)
-
-  # Switch JSON columns back to list
-  data_types <- sapply(out, class)
-  cols_json <- which(data_types == "pq_jsonb")
-  for (col in cols_json) {
-    out[[col]] <- sapply(out[[col]], \(x) list(jsonlite::fromJSON(x)), USE.NAMES = FALSE)
-  }
-
-  out
 
 }
 

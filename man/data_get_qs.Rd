@@ -4,7 +4,7 @@
 \alias{data_get_qs}
 \title{Retrieve data from a QS file based on variable and scale}
 \usage{
-data_get_qs(var, scale)
+data_get_qs(var, scale, region)
 }
 \arguments{
 \item{var}{<\code{character}> A string specifying the name of the table to

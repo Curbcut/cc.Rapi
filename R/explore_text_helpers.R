@@ -13,9 +13,9 @@
 #' \code{\link{update_scale}}.
 #' @param switch_DA <`logical`> Is the `df` part of the scales that should be
 #' switched as DAs instead.
-#' @param zoom_levels <`named numeric vector`> A named numeric vector of zoom
-#' levels. Usually one of the `mzl_*`, or the output of
-#' \code{\link{geography_server}}.
+#' @param top_scale <`character`> The current top scale. When there are no name_2
+#' in a small scale (DA), the name of the feature of the top scale in which the
+#' DA fall will be used as context. e.g. DA 490543 (Le Plateau Mont-Royal).
 #' @param shown_scale <`character`> While the `scale` argument is the scale
 #' for which to calculate regional values, `shown_scale` is the scale which
 #' would fit the `select_id`. In use for raster data, where we show region values
@@ -27,7 +27,7 @@
 #'
 #' @return A list containing multiple texts used for the explore text panel.
 #' @export
-explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
+explore_context <- function(region, select_id, scale, switch_DA, top_scale,
                             shown_scale = NULL, lang = NULL) {
   # Grab the region dictionary
   region_df <- db_get(select = c("to_compare", "to_compare_determ", "to_compare_short"),
@@ -65,10 +65,9 @@ explore_context <- function(region, select_id, scale, switch_DA, zoom_levels,
   name <- dat$name
   name_2 <- dat$name_2
   if (is.na(name_2)) {
-    name_2 <- fill_name_2(
-      ID_scale = select_id, scale = scale_grab_chr_for,
-      top_scale = names(zoom_levels)[[1]]
-    )
+    name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "ID" = (
+                          SELECT "%s_ID" FROM %s."%s" WHERE "ID" = \'%s\')',
+                          schema, top_scale, top_scale, schema, scale, select_id))$name
   }
   name_2 <- cc_t(name_2, lang = lang)
   heading <- cc_t(scale_df$place_heading, lang = lang)
@@ -159,13 +158,13 @@ explore_text_parent_title <- function(var, variables, lang = NULL) {
 #' selection.
 explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
                                        scale, data, lang = NULL, time, schemas = NULL,
-                                       data_path = get_data_path(), variables, ...) {
+                                       variables, ...) {
   if (is.na(select_id)) {
     # Grab the region values dataframe
     region_values <- region_value(
       var = var, data = data, time = time, col = col,
       scale = scale, region = region, schemas = schemas,
-      data_path = data_path, variables = variables
+      variables = variables
     )
 
     # Return the values
@@ -182,7 +181,7 @@ explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
     time = time,
     data = data,
     schemas = schemas,
-    data_path = data_path,
+    variables = variables,
     ...
   ))
 }
@@ -206,28 +205,16 @@ explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
 #' directory containing the QS files. Default is "data/".
 #'
 #' @return A vector containing the parent value for the zone.
-explore_get_parent_data <- function(var, select_id, scale, col = "var_left",
+explore_get_parent_data <- function(var, variables, select_id, scale, col = "var_left",
                                     time_col, data_path) {
   # Get the parent string
-  parent_string <- var_get_info(var = var, what = "parent_vec")
+  parent_string <- var_get_info(var = var, variables = variables, what = "parent_vec")
 
-  # Grab the parent data, usually through data_get. If it fails, try to grab
-  # the data from the global scale in the global environment (this is useful for
-  # place explorer generation.)
-  parent_data <- tryCatch(
-    data_get(parent_string,
-             scale = scale, vr_vl = col,
-             data_path = data_path
-    ),
-    error = function(e) {
-      data <- get_from_globalenv(scale)
-      if (!parent_string %in% names(data)) {
-        return(print(paste0(parent_string, " not found in the data files.")))
-      }
-      data <- data[c("ID", parent_string)]
-      names(data)[2] <- "var_left"
-      data
-    }
+  vars <- vars_build(var_left = parent_string, scale = scale, variables = variables,
+                     time = time$var_left)$vars
+  parent_data <- data_get(
+    vars = vars, scale = scale, region = region, vr_vl = col,
+    variables = variables
   )
 
   rcol <- sprintf("%s_%s", col, time_col)
@@ -264,7 +251,7 @@ explore_get_parent_data <- function(var, select_id, scale, col = "var_left",
 #'
 #' @return The resulting values
 #' @export
-explore_text_select_val <- function(var, ...) {
+explore_text_select_val <- function(var, variables, ...) {
   UseMethod("explore_text_select_val", var)
 }
 
@@ -272,7 +259,7 @@ explore_text_select_val <- function(var, ...) {
 #' @param data_path <`character`> A string representing the path to the
 #' directory containing the QS files. Default is "data/".
 #' @export
-explore_text_select_val.pct <- function(var, select_id, data, scale, col = "var_left",
+explore_text_select_val.pct <- function(var, variables, select_id, data, scale, col = "var_left",
                                         time, schemas = NULL, data_path, ...) {
   # Create empty vector
   out <- c()
@@ -289,7 +276,7 @@ explore_text_select_val.pct <- function(var, select_id, data, scale, col = "var_
 
   # Get the parent data
   all_count <- explore_get_parent_data(
-    var = var, select_id = select_id,
+    var = var, variables = variables, select_id = select_id,
     scale = scale, time_col = time[[col]],
     data_path = data_path
   )
@@ -307,9 +294,9 @@ explore_text_select_val.pct <- function(var, select_id, data, scale, col = "var_
 #' @describeIn explore_text_select_val Method for `ind`
 #' @param lang <`character`> Active language. `"en"` or `"fr"`
 #' @export
-explore_text_select_val.ind <- function(var, data, select_id, col = "var_left",
+explore_text_select_val.ind <- function(var, variables, data, select_id, col = "var_left",
                                         time, lang, schemas = NULL, ...) {
-  explore_text_select_val_ind(var = var, data = data, select_id = select_id,
+  explore_text_select_val_ind(var = var, variables, data = data, select_id = select_id,
                               col = col, time = time, lang = lang, schemas = schemas,
                               ...)
 }
@@ -339,14 +326,14 @@ explore_text_select_val.ind <- function(var, data, select_id, col = "var_left",
 #'
 #' @return The resulting values
 #' @export
-explore_text_select_val_ind <- function(var, data, select_id, col = "var_left",
+explore_text_select_val_ind <- function(var, variables, data, select_id, col = "var_left",
                                         time, lang, schemas = NULL, val = NULL, ...) {
   UseMethod("explore_text_select_val_ind", var)
 }
 
 #' @describeIn explore_text_select_val_ind Method for `scalar`
 #' @export
-explore_text_select_val_ind.scalar <- function(var, data, select_id, col = "var_left",
+explore_text_select_val_ind.scalar <- function(var, variables, data, select_id, col = "var_left",
                                                time, lang, schemas = NULL, val = NULL, ...) {
 
   # Create empty vector
@@ -368,7 +355,7 @@ explore_text_select_val_ind.scalar <- function(var, data, select_id, col = "var_
   }
 
   # Grab the rank name for the rank
-  rank_names <- var_get_info(var = var, what = "rank_name")[[1]]
+  rank_names <- var_get_info(var = var, variables = variables, what = "rank_name")[[1]]
   out$val <- rank_names[rank]
 
   # Lower letters
@@ -383,7 +370,7 @@ explore_text_select_val_ind.scalar <- function(var, data, select_id, col = "var_
 
 #' @describeIn explore_text_select_val_ind Method for `ordinal`
 #' @export
-explore_text_select_val_ind.ordinal <- function(var, data, select_id, col = "var_left",
+explore_text_select_val_ind.ordinal <- function(var, variables, data, select_id, col = "var_left",
                                                 time, lang, schemas = NULL, val = NULL, ...) {
 
   # Create empty vector
@@ -402,7 +389,7 @@ explore_text_select_val_ind.ordinal <- function(var, data, select_id, col = "var
   }
 
   # Grab the rank name for the rank
-  rank_names <- var_get_info(var = var, what = "rank_name")[[1]]
+  rank_names <- var_get_info(var = var, variables = variables, what = "rank_name")[[1]]
   out$val <- rank_names[rank]
 
   # Lower letters
@@ -417,7 +404,7 @@ explore_text_select_val_ind.ordinal <- function(var, data, select_id, col = "var
 
 #' @describeIn explore_text_select_val Default method
 #' @export
-explore_text_select_val.default <- function(var, data, select_id, col = "var_left",
+explore_text_select_val.default <- function(var, variables, data, select_id, col = "var_left",
                                             time, schemas = NULL, ...) {
   # Create empty vector
   out <- c()
@@ -481,7 +468,7 @@ explore_text_select_val.default <- function(var, data, select_id, col = "var_lef
 #' other observations with a lower value for the specified variable than the
 #' selected observation.
 #' }
-explore_text_selection_comparison <- function(var = NULL, data, select_id,
+explore_text_selection_comparison <- function(var = NULL, variables, data, select_id,
                                               col = "var_left",
                                               ranks_override = NULL,
                                               lang = NULL, time_col, schemas = NULL,
@@ -518,7 +505,7 @@ explore_text_selection_comparison <- function(var = NULL, data, select_id,
   rank <- findInterval(higher_than, quants) + 1
   ranks_chr <-
     if (is.null(ranks_override)) {
-      var_get_info(var = var, what = "rankings_chr")[[1]]
+      var_get_info(var = var, variables = variables, what = "rankings_chr")[[1]]
     } else {
       ranks_override
     }
@@ -712,7 +699,7 @@ explore_text_color <- function(x, meaning) {
 #' 'p_start' from the 'context' object and includes a message indicating that
 #' the information for 'var_left' or 'var_right' is not available. Returns NULL
 #' otherwise.
-explore_text_check_na <- function(context, data, select_id, vars, time,
+explore_text_check_na <- function(context, variables, data, select_id, vars, time,
                                   lang = NULL, schemas = NULL, val = NULL) {
   # If there are no selection, returns NULL
   if (is.na(select_id)) {
@@ -722,7 +709,7 @@ explore_text_check_na <- function(context, data, select_id, vars, time,
   # Construct the NA output text
   na_text <- \(var, var_left) {
     exp <- var_get_info(
-      var = var, what = "explanation",
+      var = var, variables = variables, what = "explanation",
       translate = TRUE, lang = lang, schemas_col = schemas[[if (var_left) "var_left" else "var_right"]]
     )
     out <- sprintf(cc_t("we currently don't have information regarding %s",

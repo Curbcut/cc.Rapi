@@ -20,9 +20,9 @@
 #' default, their info will be the one of their DA.
 #' @param lang <`character`> A string indicating the language in which to
 #' translates the variable. Defaults to NULL. Usually is `r$lang()`.
-#' @param zoom_levels <`named numeric vector`> A named numeric vector of zoom
-#' levels. Usually one of the `mzl_*`, or the output of
-#' \code{\link{geography_server}}.
+#' @param top_scale <`character`> The current top scale. When there are no name_2
+#' in a small scale (DA), the name of the feature of the top scale in which the
+#' DA fall will be used as context. e.g. Dissemination area 24520104 (Lavaltrie).
 #' @param time <`numeric named list`> The `time` at which data is displayed.
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' @param ... Additional arguments passed to the dispatched function.
@@ -30,7 +30,7 @@
 #' @return The resulting text.
 #' @export
 explore_text <- function(vars, region, select_id, scale, time, data,
-                         schemas, zoom_levels,
+                         schemas, top_scale,
                          variables,
                          lang = NULL, ...) {
   UseMethod("explore_text", vars)
@@ -52,7 +52,7 @@ explore_text <- function(vars, region, select_id, scale, time, data,
 #' for normal operations.
 #' @export
 explore_text.q5 <- function(vars, region, select_id, scale, time, data,
-                            schemas, zoom_levels,
+                            schemas, top_scale,
                             variables,
                             lang = NULL, shown_scale = NULL, val = NULL, ...) {
 
@@ -65,7 +65,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    shown_scale = shown_scale, zoom_levels = zoom_levels, lang = lang
+    shown_scale = shown_scale, top_scale = top_scale, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -77,7 +77,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     context = context, data = data,
     select_id = select_id, vars = vars,
     time = time, lang = lang, schemas = schemas,
-    val = val
+    val = val, variables = variables
   )
   if (!is.null(na_check)) {
     return(na_check)
@@ -88,7 +88,8 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     var = vars$var_left, region = region,
     select_id = select_id, data = data,
     scale = scale, lang = lang,
-    time = time, schemas = schemas, val = val, variables = variables
+    time = time, schemas = schemas, val = val,
+    variables = variables
   )
 
   # Put it all together
@@ -107,7 +108,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
       var = vars$var_left, data = data,
       select_id = select_id, lang = lang,
       time_col = time$var_left, schemas = schemas,
-      val = val
+      val = val, variables = variables
     )
 
     # Make the first sentence of the paragraph
@@ -117,7 +118,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     )
 
     # Grab the explanation and capitalize the first letter
-    exp <- var_get_info(vars$var_left,
+    exp <- var_get_info(vars$var_left, variables = variables,
       what = "explanation", translate = TRUE,
       lang = lang, schemas_col = schemas$var_left
     ) |>
@@ -154,7 +155,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
 #' @rdname explore_text
 #' @export
 explore_text.bivar <- function(vars, region, select_id, scale, time, data,
-                               schemas, zoom_levels,
+                               schemas, top_scale,
                                variables,
                                lang = NULL, ...) {
   # Append date function helper
@@ -194,7 +195,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    zoom_levels = zoom_levels, lang = lang
+    top_scale = top_scale, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -205,7 +206,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   na_check <- explore_text_check_na(
     context = context, data = data,
     select_id = select_id, vars = vars,
-    time = time, lang = lang, schemas = schemas
+    time = time, lang = lang, schemas = schemas,
+    variables = variables
   )
   if (!is.null(na_check)) {
     return(na_check)
@@ -444,7 +446,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
 #' @rdname explore_text
 #' @export
 explore_text.delta <- function(vars, region, select_id, scale, time, data,
-                               schemas, zoom_levels,
+                               schemas, top_scale,
                                variables,
                                lang = NULL, shown_scale = NULL, val = NULL, ...) {
 
@@ -457,7 +459,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale, shown_scale = shown_scale,
-    zoom_levels = zoom_levels, lang = lang
+    top_scale = top_scale, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -469,7 +471,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
     context = context, data = data,
     select_id = select_id, vars = vars,
     lang = lang, time = time, schemas = schemas,
-    val = val
+    variables = variables, val = val
   )
   if (!is.null(na_check)) {
     return(na_check)
@@ -581,7 +583,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
 #' @rdname explore_text
 #' @export
 explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
-                                     schemas, zoom_levels,
+                                     schemas, top_scale,
                                      variables,
                                      lang = NULL, ...) {
 
@@ -591,7 +593,7 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    zoom_levels = zoom_levels, lang = lang
+    top_scale = top_scale, lang = lang
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -602,7 +604,8 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
   na_check <- explore_text_check_na(
     context = context, data = data,
     select_id = select_id, vars = vars,
-    lang = lang, time = time, schemas = schemas
+    lang = lang, time = time, schemas = schemas,
+    variables = variables
   )
   if (!is.null(na_check)) {
     return(na_check)

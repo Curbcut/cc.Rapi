@@ -10,8 +10,12 @@
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
 #'
 #' @return A data.frame object with the selected data from the specified table.
-data_get_qs <- function(var, scale) {
-  db_get(select = "*", from = sprintf("%s_%s", scale, var), schema = schema)
+data_get_qs <- function(var, scale, region) {
+  query <- sprintf(sprintf('SELECT * FROM %s.\"%s_%s\" WHERE "ID" IN (
+        SELECT jsonb_array_elements_text("scales"->\'%s\')::text
+        FROM "%s".regions_dictionary WHERE "region" = \'%s\')',
+        schema, scale, var, scale, schema, region))
+  db_get_helper(query)
 }
 
 #' Calculate the percentage change between two variables over two years
@@ -37,7 +41,7 @@ data_get_delta <- function(vars, time, scale, vl_vr = "var_left") {
   time_col <- time[[vl_vr]]
 
   # Retrieve
-  data <- data_get_qs(var, scale)
+  data <- data_get_qs(var = var, scale = scale, region = region)
 
   # Calculate breaks for the right columns
   cols <- match_schema_to_col(data = data, time = time_col, col = var, schemas = NULL)
@@ -100,20 +104,19 @@ data_get <- function(vars, scale, region, variables, ...) {
 }
 
 #' @describeIn data_get The method for q5.
+#' @param vr_vl <`character`> Is the parent data coming from the var_left
+#' or var_right? How should it be renamed.
 #' @export
-data_get.q5 <- function(vars, scale, region = NULL, variables, ...) {
+data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left", ...) {
   # Get data
-  data <- data_get_qs(vars$var_left, scale = scale)
-
-  # Filter to region
-  data <- filter_region(data = data, scale = scale, region = region)
+  data <- data_get_qs(vars$var_left, scale = scale, region = region)
 
   # Append breaks
   data <- data_append_breaks(
     var = vars$var_left,
     data = data,
     q3_q5 = "q5",
-    rename_col = "var_left",
+    rename_col = vl_vr,
     variables = variables
   )
 
@@ -127,13 +130,13 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, ...) {
 #' @export
 data_get.bivar <- function(vars, scale, region, schemas, ...) {
   # Get var_left and var_right data
-  vl <- data_get_qs(vars$var_left, scale = scale)
+  vl <- data_get_qs(vars$var_left, scale = scale, region = region)
 
   # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale)) {
     return(tibble::tibble())
   }
-  vr <- data_get_qs(vars$var_right, scale = scale)
+  vr <- data_get_qs(vars$var_right, scale = scale, region = region)
 
   # If there is more to schemas than time, that means there are many possibilities
   # for right-hand variable.
@@ -186,9 +189,6 @@ data_get.bivar <- function(vars, scale, region, schemas, ...) {
 
   # Merge
   data <- merge(all_data[[1]]$data, all_data[[2]]$data, by = "ID", all = TRUE)
-
-  # Filter to region
-  data <- filter_region(data = data, scale = scale, region = region)
 
   # Re-add breaks
   attr(data, "breaks_var_left") <- breaks_vl
@@ -283,9 +283,6 @@ data_get_delta_fun.scalar <- function(vars, scale, region, time, ...) {
     scale = scale
   )
 
-  # Filter to region
-  data <- filter_region(data = data, scale = scale, region = region)
-
   # Is delta ONLY positive or ONLY negative? Inform which color scale to use
   vec <- data$var_left
   vec <- vec[!is.na(vec)]
@@ -320,9 +317,6 @@ data_get_delta_fun.ordinal <- function(vars, scale, region, time, ...) {
     vars = vars, time = time,
     scale = scale
   )
-
-  # Filter to region
-  data <- filter_region(data = data, scale = scale, region = region)
 
   # Is delta ONLY positive or ONLY negative? Inform which color scale to use
   vec <- data$var_left
@@ -385,9 +379,6 @@ data_get.delta_bivar <- function(vars, scale, region, time, ...) {
     attr(data, i) <- prev_attr_vr[[i]]
   }
 
-  # Filter to region
-  data <- filter_region(data = data, scale = scale, region = region)
-
   # Add the `group` for the map colouring
   data$var_left_q3 <- ntile(data$var_left, 3)
   data$var_right_q3 <- ntile(data$var_right, 3)
@@ -446,38 +437,6 @@ data_get.bivar_ldelta_rq3 <- function(vars, scale, region, time, ...) {
   return(data)
 }
 
-#' Filter data by region
-#'
-#' Filters a given data frame by the region and scale specified. The function
-#' grabs a global variable \code{regions_dictionary} to identify the IDs
-#' associated with the given region and scale.
-#'
-#' @param data <`data.frame`> Data.frame containing the data to be filtered.
-#' It must have an \code{ID} column that matches the IDs in \code{regions_dictionary}.
-#' @param scale <`character`> The scale at which to filter the data (e.g., 'CSD', 'CT').
-#' @param region <`character`> The code of the region for filtering (e.g., 'CMA').
-#'
-#' @return Returns a filtered data frame containing only the rows corresponding
-#' to the specified region and scale.
-#' @export
-filter_region <- function(data, scale, region) {
-  # If no region supplied, return all
-  if (is.null(region)) {
-    return(data)
-  }
-
-  warning("TKTKT WHY ARE WE EVEN USING THIS? WE SHOULD FILTER IN THE DATA IMPORT SQL CALL")
-
-  # TKTKTK THIS IS NOT OPTIMIZED, WE ARE EXTRACTING ALL THE SCALES
-  id_reg <- db_get(select = "scales", from = "regions_dictionary", where = list(region = region),
-                   schema = "mtl")$scales[[1]][[scale]]
-
-  data <- data[data$ID %in% id_reg, ]
-
-  # Return filtered data
-  return(data)
-}
-
 #' @describeIn data_get The default method.
 #' @param vr_vl <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
@@ -495,13 +454,10 @@ data_get.default <- function(vars, scale, region = NULL, vr_vl, ...) {
 
   # Default method retrieves the data of the first element of `vars`
   data <- if (var == "area") {
-    get_from_globalenv(scale)[c("ID", "area")]
+    db_get(select = c("ID", "area"), from = scale, schema = "mtl")
   } else {
-    data_get_qs(var = var, scale = scale)
+    data_get_qs(var = var, scale = scale, region = region)
   }
-
-  # Filter by region
-  data <- filter_region(data = data, scale = scale, region = region)
 
   # To keep it constant, rename with var_left
   names(data) <- gsub(var, vr_vl, names(data))

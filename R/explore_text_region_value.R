@@ -29,7 +29,7 @@ region_value <- function(var, data, time, scale, region, select_id, col, schemas
   rv <- region_value_data_grab(
     var = var, data = data, time = time, col = col,
     scale = scale, region = region, schemas = schemas,
-    data_path = data_path, variables = variables
+    variables = variables
   )
 
   # Return the output of every method
@@ -171,7 +171,7 @@ region_value_method.default <- function(var, data_vals, parent_vals, ...) {
 #' which holds the parent data values.
 #' @export
 region_value_data_grab <- function(var, data, time, scale, region, col, schemas = NULL,
-                                   data_path) {
+                                   variables) {
   # Get the parent variable
   parent_string <- var_get_info(var, variables = variables, what = "parent_vec")
 
@@ -179,9 +179,11 @@ region_value_data_grab <- function(var, data, time, scale, region, col, schemas 
   if ("count" %in% class(var)) {
     parent_vals <- NULL
   } else {
+    vars <- vars_build(var_left = parent_string, scale = scale, variables = variables,
+                       time = time$var_left)$vars
     parent_data <- data_get(
-      vars = parent_string, scale = scale, region = region, vr_vl = col,
-      data_path = data_path
+      vars = vars, scale = scale, region = region, vr_vl = col,
+      variables = variables
     )
     # In the case where there is just one value, no time. Like `area`.
     if (col %in% names(parent_data)) {

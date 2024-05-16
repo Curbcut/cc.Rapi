@@ -340,7 +340,7 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   # Add it to the next data attributes
   prev_attr$breaks_var <- breaks_var
   # Take the opportunity to also add schema to the data
-  prev_attr$schema <- variables$schema[variables$var_code == var]
+  prev_attr$schema <- variables$schema[variables$var_code == var][[1]]
 
   # Calculate break
   quintiles <- use_quantiles(data_vec)
