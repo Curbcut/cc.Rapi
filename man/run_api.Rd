@@ -4,7 +4,11 @@
 \alias{run_api}
 \title{Run Plumber API}
 \usage{
-run_api()
+run_api(port = 8000)
+}
+\arguments{
+\item{port}{<\code{numeric}> The port on which the API should be listening. Defaults
+to 8000.}
 }
 \value{
 This function does not return a value. It starts the Plumber API server.

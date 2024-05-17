@@ -19,10 +19,18 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
   schemas <- jsonlite::fromJSON(schemas)
 
   promises::future_promise({
-    # Just make sure the pool is in the environment
-    db_pool
-    cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
-                     region = region, time = time, select_id = select_id,
-                     top_scale = top_scale, lang = lang, schemas = schemas)
+    tryCatch({
+      # Just make sure the pool is in the environment
+      db_pool
+
+      # Execute the query
+      cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
+                       region = region, time = time, select_id = select_id,
+                       top_scale = top_scale, lang = lang, schemas = schemas)
+
+    }, error = function(e) {
+      # Handle individual query error
+      list(error = paste("500 - Internal server error:", e$message))
+    })
   })
 }

@@ -38,6 +38,9 @@ both var_left and var_right, and any potential parent variable aswell.}
 
 \item{...}{Additional arguments passed to methods.}
 
+\item{vl_vr}{<\code{character}> Is the parent data coming from the var_left
+or var_right? How should it be renamed.}
+
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
@@ -61,6 +64,8 @@ methods will be used to retrieve and process the data.
 }
 \section{Methods (by class)}{
 \itemize{
+\item \code{data_get(q5)}: The method for q5.
+
 \item \code{data_get(bivar)}: The method for bivar.
 
 \item \code{data_get(delta)}: The method for delta.
