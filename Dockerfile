@@ -19,4 +19,4 @@ RUN R -e "remotes::install_github('Curbcut/cc.Rapi')"
 # Expose the port the API will run on
 EXPOSE 8000
 
-CMD ["R", "-e", "cc.Rapi::run_api()"]
+CMD ["R", "-e", "cc.Rapi::run_api(host = '0.0.0.0', port = 8000)"]

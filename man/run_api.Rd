@@ -4,9 +4,12 @@
 \alias{run_api}
 \title{Run Plumber API}
 \usage{
-run_api(port = 8000)
+run_api(host = "127.0.0.1", port = 8000)
 }
 \arguments{
+\item{host}{<\code{character}> Which host to start the API? Defaults to 127.0.0.1
+for localhost. Must be "0.0.0.0" in docker.}
+
 \item{port}{<\code{numeric}> The port on which the API should be listening. Defaults
 to 8000.}
 }
