@@ -13,7 +13,7 @@ db_pool <<- cc.Rapi::db_connection()
 #* @param select_id etc
 #* @get /context
 function(var_left, var_right = " ", scale, region, time, select_id = NA,
-         lang = NULL,
+         lang = NULL, top_scale,
          schemas = jsonlite::toJSON(
            list(var_left = list(time = time), var_right = list(time = time)))) {
   schemas <- jsonlite::fromJSON(schemas)
@@ -23,6 +23,6 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
     db_pool
     cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
                      region = region, time = time, select_id = select_id,
-                     lang = lang, schemas = schemas)
+                     top_scale = top_scale, lang = lang, schemas = schemas)
   })
 }
