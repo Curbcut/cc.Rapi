@@ -2,7 +2,10 @@
 % Please edit documentation in R/api_context.R
 \name{context}
 \alias{context}
-\title{Generate Contextual Information for a Curbcut page}
+\title{This function generates contextual information such as legend, graph, and text
+for the application based on provided parameters. It fetches variables from
+the database, processes them, and then generates the necessary components
+for the application's context.}
 \usage{
 context(
   var_left,
