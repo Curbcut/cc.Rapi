@@ -1,4 +1,4 @@
-# var_left <- "housing_tenant"
+# var_left <- "housing_rent"
 # var_right = " "
 # scale <- "DA"
 # region <- "CMA"
@@ -10,7 +10,7 @@
 # db_pool <- db_connection()
 
 
-#' Generate Contextual Information for a Curbcut page
+# Generate Contextual Information for a Curbcut page
 #'
 #' This function generates contextual information such as legend, graph, and text
 #' for the application based on provided parameters. It fetches variables from

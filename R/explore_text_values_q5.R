@@ -112,6 +112,7 @@ explore_text_values_q5.count <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 
@@ -160,6 +161,7 @@ explore_text_values_q5.dollar <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 
@@ -216,6 +218,7 @@ explore_text_values_q5.ind <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 
@@ -305,6 +308,7 @@ explore_text_values_q5.avg <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 
@@ -378,6 +382,7 @@ explore_text_values_q5.sqkm <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 
@@ -443,6 +448,7 @@ explore_text_values_q5.ppo <- function(var, region,
     lang = lang,
     time = time,
     schemas = schemas,
+    variables = variables,
     ...
   )
 

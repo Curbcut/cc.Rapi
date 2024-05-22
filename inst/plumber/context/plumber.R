@@ -4,10 +4,20 @@ future::plan("multisession")
 # Initialize database pool
 db_pool <<- cc.Rapi::db_connection()
 
-#* @filter cors
-cors <- function(res) {
+#' @filter cors
+cors <- function(req, res) {
+
   res$setHeader("Access-Control-Allow-Origin", "*")
-  plumber::forward()
+
+  if (req$REQUEST_METHOD == "OPTIONS") {
+    res$setHeader("Access-Control-Allow-Methods","*")
+    res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+    res$status <- 200
+    return(list())
+  } else {
+    plumber::forward()
+  }
+
 }
 
 #* Echo back the input
