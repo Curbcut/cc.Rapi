@@ -64,10 +64,22 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
 
   # Save the plot to a temporary file
   legend_file <- tempfile(fileext = ".png")
-  ggplot2::ggsave(legend_file, plot = graph, device = "png")
+  # Calculate the dimensions in inches, given that 1 inch is 96 pixels
+  width_in <- 268 / 96
+  height_in <- 60 / 96
+  # Save the plot with specified dimensions
+  ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
+                  height = height_in, units = "in", dpi = 96)
 
   # Save the plot to a temporary file
   graph_file <- tempfile(fileext = ".png")
+  # Calculate the dimensions in inches, given that 1 inch is 96 pixels
+  width_in <- 268 / 96
+  height_in <- 150 / 96
+  # Save the plot with specified dimensions
+  ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
+                  height = height_in, units = "in", dpi = 96)
+
   ggplot2::ggsave(graph_file, plot = graph, device = "png")
 
   return(list(legend = base64enc::base64encode(legend_file),
