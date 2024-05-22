@@ -80,8 +80,6 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
   ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
                   height = height_in, units = "in", dpi = 96)
 
-  ggplot2::ggsave(graph_file, plot = graph, device = "png")
-
   return(list(legend = base64enc::base64encode(legend_file),
               graph = base64enc::base64encode(graph_file),
               text = text))
