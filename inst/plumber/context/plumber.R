@@ -4,6 +4,12 @@ future::plan("multisession")
 # Initialize database pool
 db_pool <<- cc.Rapi::db_connection()
 
+#* @filter cors
+cors <- function(res) {
+  res$setHeader("Access-Control-Allow-Origin", "*")
+  plumber::forward()
+}
+
 #* Echo back the input
 #* @param var_left etc
 #* @param var_right etc
@@ -34,3 +40,4 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
     })
   })
 }
+
