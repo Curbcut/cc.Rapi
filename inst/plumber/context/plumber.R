@@ -27,7 +27,7 @@ cors <- function(req, res) {
   }
 }
 
-#* Echo back the input
+#* Send context (legend, graph, text)
 #* @param var_left etc
 #* @param var_right etc
 #* @param scale etc
@@ -42,19 +42,27 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
   schemas <- jsonlite::fromJSON(schemas)
 
   # promises::future_promise({
-    tryCatch({
-      # Just make sure the pool is in the environment
-      # db_pool
+  tryCatch({
+    # Just make sure the pool is in the environment
+    # db_pool
 
-      # Execute the query
-      cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
-                       region = region, time = time, select_id = select_id,
-                       top_scale = top_scale, lang = lang, schemas = schemas)
+    # Execute the query
+    cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
+                     region = region, time = time, select_id = select_id,
+                     top_scale = top_scale, lang = lang, schemas = schemas)
 
-    }, error = function(e) {
-      # Handle individual query error
-      list(error = paste("500 - Internal server error:", e$message))
-    })
+  }, error = function(e) {
+    # Handle individual query error
+    list(error = paste("500 - Internal server error:", e$message))
+  })
   # })
+}
+
+#* Health check
+#* @get /
+#* @response 200 A simple health check response.
+function(res) {
+  res$status <- 200
+  list(message = "Welcome to the Curbcut Rapi")
 }
 
