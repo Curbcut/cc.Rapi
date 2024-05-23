@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libgit2-dev \
     libpq-dev \
-    libxml2-dev
+    libxml2-dev \
+    libcairo2-dev \
+    libharfbuzz-dev \
+    libfribidi-dev
 
 # Install remotes package to allow installation from GitHub
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org/')"
