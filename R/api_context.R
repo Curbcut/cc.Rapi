@@ -125,7 +125,7 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
   # Timing explore_graph
   explore_graph_start <- Sys.time()
   graph <- explore_graph(vars = vars, select_id = select_id, scale = scale, data = data,
-                         time = time_formatted, schemas = schemas, lang = lang, variables = variables)
+                time = time_formatted, schemas = schemas, lang = lang, variables = variables)
   explore_graph_end <- Sys.time()
 
   # Timing explore_text
