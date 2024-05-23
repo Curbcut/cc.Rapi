@@ -31,13 +31,67 @@
 #' @export
 context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
                     lang = NULL, top_scale, schemas = list(var_left = list(time = time),
-                                                             var_right = list(time = time))) {
+                                                           var_right = list(time = time))) {
+
+  # var_vec <- var_left
+  # if (var_right != " ") var_vec <- c(var_left, var_right)
+  # var_vec <- paste(sprintf("'%s'", var_vec), collapse = ", ")
+  #
+  # # Execute the query using db_get_helper
+  # variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables
+  #                                    WHERE var_code IN (%s)
+  #                                    UNION
+  #                                    SELECT * FROM mtl.variables
+  #                                    WHERE var_code IN (
+  #                                    SELECT parent_vec
+  #                                    FROM mtl.variables
+  #                                    WHERE var_code IN (%s)
+  #                                    )
+  #                                    ", var_vec, var_vec))
+  #
+  # vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
+  # time_formatted <- vars$time
+  # vars <- vars$vars
+  # data <- data_get(vars, scale, region, variables = variables)
+  #
+  # legend <- legend_render(vars = vars, scale = scale, data = data, variables = variables)
+  # graph <- explore_graph(vars = vars, select_id = select_id, scale = scale, data = data,
+  #                        time = time_formatted, schemas = schemas, lang = lang, variables = variables)
+  # text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
+  #                      data = data, time = time_formatted, schemas = schemas, lang = lang,
+  #                      top_scale = top_scale, variables = variables)
+  #
+  #
+  # # Save the plot to a temporary file
+  # legend_file <- tempfile(fileext = ".png")
+  # # Calculate the dimensions in inches, given that 1 inch is 96 pixels
+  # width_in <- 268 / 96
+  # height_in <- 60 / 96
+  # # Save the plot with specified dimensions
+  # ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
+  #                 height = height_in, units = "in", dpi = 96)
+  #
+  # # Save the plot to a temporary file
+  # graph_file <- tempfile(fileext = ".png")
+  # # Calculate the dimensions in inches, given that 1 inch is 96 pixels
+  # width_in <- 268 / 96
+  # height_in <- 150 / 96
+  # # Save the plot with specified dimensions
+  # ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
+  #                 height = height_in, units = "in", dpi = 96)
+  #
+  # return(list(legend = base64enc::base64encode(legend_file),
+  #             graph = base64enc::base64encode(graph_file),
+  #             text = text))
+
+  start_time <- Sys.time()
 
   var_vec <- var_left
   if (var_right != " ") var_vec <- c(var_left, var_right)
   var_vec <- paste(sprintf("'%s'", var_vec), collapse = ", ")
 
-  # Execute the query using db_get_helper
+  # Timing db_get_helper
+  db_get_start <- Sys.time()
   variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables
                                      WHERE var_code IN (%s)
                                      UNION
@@ -48,41 +102,78 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
                                      WHERE var_code IN (%s)
                                      )
                                      ", var_vec, var_vec))
+  db_get_end <- Sys.time()
 
+  # Timing vars_build
+  vars_build_start <- Sys.time()
   vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
+  vars_build_end <- Sys.time()
+
   time_formatted <- vars$time
   vars <- vars$vars
-  data <- data_get(vars, scale, region, variables = variables)
 
+  # Timing data_get
+  data_get_start <- Sys.time()
+  data <- data_get(vars, scale, region, variables = variables)
+  data_get_end <- Sys.time()
+
+  # Timing legend_render
+  legend_render_start <- Sys.time()
   legend <- legend_render(vars = vars, scale = scale, data = data, variables = variables)
+  legend_render_end <- Sys.time()
+
+  # Timing explore_graph
+  explore_graph_start <- Sys.time()
   graph <- explore_graph(vars = vars, select_id = select_id, scale = scale, data = data,
                          time = time_formatted, schemas = schemas, lang = lang, variables = variables)
+  explore_graph_end <- Sys.time()
+
+  # Timing explore_text
+  explore_text_start <- Sys.time()
   text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
                        data = data, time = time_formatted, schemas = schemas, lang = lang,
                        top_scale = top_scale, variables = variables)
+  explore_text_end <- Sys.time()
 
-
-  # Save the plot to a temporary file
+  # Timing legend file save
+  legend_save_start <- Sys.time()
   legend_file <- tempfile(fileext = ".png")
-  # Calculate the dimensions in inches, given that 1 inch is 96 pixels
   width_in <- 268 / 96
   height_in <- 60 / 96
-  # Save the plot with specified dimensions
   ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
                   height = height_in, units = "in", dpi = 96)
+  legend_save_end <- Sys.time()
 
-  # Save the plot to a temporary file
+  # Timing graph file save
+  graph_save_start <- Sys.time()
   graph_file <- tempfile(fileext = ".png")
-  # Calculate the dimensions in inches, given that 1 inch is 96 pixels
   width_in <- 268 / 96
   height_in <- 150 / 96
-  # Save the plot with specified dimensions
   ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
                   height = height_in, units = "in", dpi = 96)
+  graph_save_end <- Sys.time()
 
-  return(list(legend = base64enc::base64encode(legend_file),
-              graph = base64enc::base64encode(graph_file),
-              text = text))
+  end_time <- Sys.time()
+
+  timing <- list(
+    db_get_variables = db_get_end - db_get_start,
+    vars_build = vars_build_end - vars_build_start,
+    data_get = data_get_end - data_get_start,
+    legend_render = legend_render_end - legend_render_start,
+    explore_graph = explore_graph_end - explore_graph_start,
+    explore_text = explore_text_end - explore_text_start,
+    legend_save = legend_save_end - legend_save_start,
+    graph_save = graph_save_end - graph_save_start,
+    total = end_time - start_time
+  )
+  timing <- lapply(timing, as.numeric)
+
+  return(list(
+    legend = base64enc::base64encode(legend_file),
+    graph = base64enc::base64encode(graph_file),
+    text = text,
+    timing = timing
+  ))
 }
 
 

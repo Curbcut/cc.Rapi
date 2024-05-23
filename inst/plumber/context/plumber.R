@@ -1,5 +1,5 @@
-# Initialize future plan
-future::plan("multisession")
+# # Initialize future plan
+# future::plan("multisession")
 
 # Initialize database pool
 db_pool <<- cc.Rapi::db_connection()
@@ -41,10 +41,10 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
            list(var_left = list(time = time), var_right = list(time = time)))) {
   schemas <- jsonlite::fromJSON(schemas)
 
-  promises::future_promise({
+  # promises::future_promise({
     tryCatch({
       # Just make sure the pool is in the environment
-      db_pool
+      # db_pool
 
       # Execute the query
       cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
@@ -55,6 +55,6 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
       # Handle individual query error
       list(error = paste("500 - Internal server error:", e$message))
     })
-  })
+  # })
 }
 
