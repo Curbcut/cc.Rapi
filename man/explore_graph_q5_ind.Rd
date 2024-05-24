@@ -13,7 +13,7 @@ explore_graph_q5_ind(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   val = NULL,
@@ -27,7 +27,7 @@ explore_graph_q5_ind(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   val = NULL,
@@ -41,7 +41,7 @@ explore_graph_q5_ind(
   data,
   time,
   schemas,
-  scales_as_DA = c("building", "street"),
+  variables,
   lang = NULL,
   font_family = "acidgrotesk-book",
   val = NULL,
@@ -65,10 +65,6 @@ A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$t
 
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
-
-\item{scales_as_DA}{<\verb{character vector}> A character vector of \code{scales}
-that should be handled as a "DA" scale, e.g. \code{building} and \code{street}. By default,
-their graph will be the one of their DA.}
 
 \item{lang}{<\code{character}> A character string indicating the language to
 translate variable titles to.}

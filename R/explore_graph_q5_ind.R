@@ -14,9 +14,6 @@
 #' @param scale <`character`> Current scale.
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
-#' @param scales_as_DA <`character vector`> A character vector of `scales`
-#' that should be handled as a "DA" scale, e.g. `building` and `street`. By default,
-#' their graph will be the one of their DA.
 #' @param lang <`character`> A character string indicating the language to
 #' translate variable titles to.
 #' @param font_family <`character`> A string specifying the font family for the
@@ -29,7 +26,7 @@
 #' @return A ggplot2 object representing the plot.
 #' @export
 explore_graph_q5_ind <- function(vars, select_id, scale, data, time, schemas,
-                                 scales_as_DA = c("building", "street"), lang = NULL,
+                                 variables, lang = NULL,
                                  font_family = "acidgrotesk-book",
                                  val = NULL, ...) {
   UseMethod("explore_graph_q5_ind", vars)
@@ -38,7 +35,7 @@ explore_graph_q5_ind <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph_q5_ind
 #' @export
 explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, schemas,
-                                        scales_as_DA = c("building", "street"),
+                                        variables,
                                         lang = NULL,
                                         font_family = "acidgrotesk-book",
                                         val = NULL, ...) {
@@ -49,7 +46,7 @@ explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, sche
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
     scales_as_DA = scales_as_DA, select_id = select_id,
-    data = data, lang = lang, scale = scale
+    data = data, lang = lang, scale = scale, variables = variables
   )
 
   # Color as function
@@ -81,7 +78,7 @@ explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, sche
 
   # Draw the plot
   plot <-
-    data[!is.na(data[[rcol]]), rcol] |>
+    data[!is.na(data[[rcol]]), ][rcol] |>
     # remove_outliers_df(cols = c("var_left")) |>
     ggplot2::ggplot(ggplot2::aes(!!ggplot2::sym(rcol))) +
     ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(..count.. / sum(..count..)),
@@ -118,7 +115,7 @@ explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, sche
 #' @rdname explore_graph_q5_ind
 #' @export
 explore_graph_q5_ind.ordinal <- function(vars, select_id, scale, data, time, schemas,
-                                         scales_as_DA = c("building", "street"),
+                                         variables,
                                          lang = NULL,
                                          font_family = "acidgrotesk-book",
                                          val = NULL, ...) {
@@ -130,7 +127,7 @@ explore_graph_q5_ind.ordinal <- function(vars, select_id, scale, data, time, sch
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
     scales_as_DA = scales_as_DA, select_id = select_id,
-    data = data, lang = lang, scale = scale
+    data = data, lang = lang, scale = scale, variables = variables
   )
 
   # Color as function

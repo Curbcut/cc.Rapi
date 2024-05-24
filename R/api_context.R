@@ -1,4 +1,4 @@
-# var_left <- "housing_rent"
+# var_left <- "age_agg_25_29_pct"
 # var_right = " "
 # scale <- "DA"
 # region <- "CMA"
