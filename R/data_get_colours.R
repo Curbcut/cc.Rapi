@@ -37,18 +37,9 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
     ))
   }
 
-  # Region and all possible `df`
-  dfs <- names(zoom_levels)
   # Get all the data
-  data_r <- sapply(dfs, \(x) tryCatch({
-    warning("DO NOT DO THIS. SINGLE SQL CALL RETRIEVAL A CBIND OF ALL SCALES.")
-    data_get(vars, scale = x, time = time, region = region,
-             variables = variables)
-    }, error = function(e) data.frame()),
-    simplify = FALSE,
-    USE.NAMES = TRUE
-  )
-  data <- Reduce(rbind, data_r)
+  data <- data_get(vars, scale = zoom_levels, time = time, region = region,
+                   variables = variables)
 
   # If it's delta, maybe change the colour table to use only negatives/positives!
   colour_table <- if (colours_table == "delta") {

@@ -15,7 +15,7 @@ context(
   time,
   select_id,
   lang = NULL,
-  top_scale,
+  zoom_levels,
   schemas = list(var_left = list(time = time), var_right = list(time = time))
 )
 }
@@ -34,7 +34,7 @@ context(
 
 \item{lang}{<\verb{character vector}>}
 
-\item{top_scale}{<\verb{character vector}>}
+\item{zoom_levels}{<\verb{character vector}>}
 
 \item{schemas}{<\code{list}>}
 }

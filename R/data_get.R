@@ -4,19 +4,66 @@
 #' QS file. The function constructs the file path based on the input, then reads
 #' the data using the qs package's \code{\link[qs]{qread}} function.
 #'
-#' @param var <`character`> A string specifying the name of the table to
+#' @param vars_vector <`character`> A string specifying the name of the table to
 #' retrieve data from. Single variable = single table. e.g. `housing_tenant`
 #' @param scale <`character`> A string specifying the scale at which to retrieve
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
 #' @param region <`character`> String of the region under study.
 #'
 #' @return A data.frame object with the selected data from the specified table.
-data_get_qs <- function(var, scale, region) {
-  query <- sprintf('SELECT * FROM %s.\"%s_%s\" WHERE "ID" IN (
-        SELECT jsonb_array_elements_text("scales"->\'%s\')::text
-        FROM "%s".regions_dictionary WHERE "region" = \'%s\')',
-        "mtl", scale, var, scale, "mtl", region)
-  db_get_helper(query)
+db_get_data_from_sql <- function(vars_vector, scales, region) {
+
+  with_ids_as <- list()
+  for (scale in scales) {
+    with_ids_as[[scale]] <-
+      sprintf("SELECT jsonb_array_elements_text(\"scales\"->'%s')::text AS ID
+  FROM \"%s\".regions_dictionary
+  WHERE \"region\" = '%s'", scale, "mtl", region)
+  }
+  with_ids_as <- paste0("WITH ids AS (", paste0(with_ids_as, collapse = " UNION "), ")")
+
+  all_vars <- list()
+  for (var in vars_vector) {
+
+    var_selections <- list()
+    for (scale in scales) {
+      var_selections[[scale]] <-
+        sprintf("SELECT *, '%s' AS scale
+  FROM %s.\"%s_%s\"
+  WHERE \"ID\" IN (SELECT ID FROM ids)", scale, "mtl", scale, var)
+    }
+    all_vars[[var]] <- paste0(var, " AS (", paste0(var_selections, collapse = " UNION ALL "), ")")
+
+  }
+  all_vars <- paste0(all_vars, collapse = ", ")
+
+
+  # Construct the main SELECT and JOIN clauses
+  main_select <- paste(sprintf("%s.*", vars_vector[[1]]), collapse = ", ")
+  join_clauses <- ""
+  if (length(vars_vector) > 1) {
+    for (i in 2:length(vars_vector)) {
+      main_select <- paste(main_select, sprintf(", %s.*", vars_vector[[i]]), collapse = ", ")
+      join_clauses <- paste(join_clauses, sprintf(
+        "LEFT JOIN %s ON %s.\"ID\" = %s.\"ID\" AND %s.scale = %s.scale ",
+        vars_vector[[i]], vars_vector[[1]], vars_vector[[i]], vars_vector[[1]], vars_vector[[i]]
+      ))
+    }
+  }
+
+  # Final query construction
+  final_call <- paste(with_ids_as, all_vars, sep = ", ")
+  final_call <- paste(final_call, sprintf("SELECT %s FROM %s %s", main_select, vars_vector[[1]], join_clauses))
+
+  # Execute the final query
+  result <- db_get_helper(final_call)
+
+  # Remove ID... and scale...
+  if (sum(grepl("ID\\.\\.|scale\\.\\.", names(result))) > 0)
+    result <- result[-grep("ID\\.\\.|scale\\.\\.", names(result))]
+
+  return(result)
+
 }
 
 #' Calculate the percentage change between two variables over two years
@@ -45,7 +92,7 @@ data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_le
   time_col <- time[[vl_vr]]
 
   # Retrieve
-  data <- data_get_qs(var = var, scale = scale, region = region)
+  data <- db_get_data(var = var, scale = scale, region = region)
 
   # Calculate breaks for the right columns
   cols <- match_schema_to_col(data = data, time = time_col, col = var, schemas = NULL)
@@ -113,19 +160,29 @@ data_get <- function(vars, scale, region, variables, ...) {
 #' @export
 data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left", ...) {
   # Get data
-  data <- data_get_qs(vars$var_left, scale = scale, region = region)
+  data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region)
 
   # Append breaks
-  data <- data_append_breaks(
-    var = vars$var_left,
-    data = data,
-    q3_q5 = "q5",
-    rename_col = vl_vr,
-    variables = variables
-  )
+
+  # So that it works as a single SQL call for map coloring, we will iterate over
+  # scales here.
+  data_scales <- split(data, data$scale)
+
+  data_scales <- lapply(data_scales, \(data) {
+    data_append_breaks(
+      var = vars$var_left,
+      data = data,
+      q3_q5 = "q5",
+      rename_col = vl_vr,
+      variables = variables
+    )
+  })
+
+  # Bind, which won't have any effect if there's a single scale.
+  data <- Reduce(rbind, lapply(data_scales, `[[`, "data"))
 
   # Return output
-  return(data$data)
+  return(data)
 }
 
 #' @describeIn data_get The method for bivar.
@@ -133,14 +190,13 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
 data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
-  # Get var_left and var_right data
-  vl <- data_get_qs(vars$var_left, scale = scale, region = region)
-
-  # If data isn't present, throw an empty tibble
+    # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale)) {
     return(data.frame())
   }
-  vr <- data_get_qs(vars$var_right, scale = scale, region = region)
+
+  # Get var_left and var_right data
+  data <- db_get_data_from_sql(unlist(vars), scale = scale, region = region)
 
   # If there is more to schemas than time, that means there are many possibilities
   # for right-hand variable.
@@ -461,7 +517,7 @@ data_get.default <- function(vars, scale, region, variables, vr_vl, ...) {
   data <- if (var == "area") {
     db_get(select = c("ID", "area"), from = scale, schema = "mtl")
   } else {
-    data_get_qs(var = var, scale = scale, region = region)
+    db_get_data_from_sql(var = var, scale = scale, region = region)
   }
 
   # To keep it constant, rename with var_left

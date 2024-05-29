@@ -1,4 +1,4 @@
-# var_left <- "age_agg_25_29_pct"
+# var_left <- c("alp")
 # var_right = " "
 # scale <- "DA"
 # region <- "CMA"
@@ -24,14 +24,15 @@
 #' @param time <`character`>
 #' @param select_id <`character`>
 #' @param lang <`character vector`>
-#' @param top_scale <`character vector`>
+#' @param zoom_levels <`character vector`>
 #' @param schemas <`list`>
 #'
 #' @return A list containing three components.
 #' @export
 context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
-                    lang = NULL, top_scale, schemas = list(var_left = list(time = time),
-                                                           var_right = list(time = time))) {
+                    lang = NULL, zoom_levels,
+                    schemas = list(var_left = list(time = time),
+                                   var_right = list(time = time))) {
 
   # var_vec <- var_left
   # if (var_right != " ") var_vec <- c(var_left, var_right)
@@ -59,7 +60,7 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
   #                        time = time_formatted, schemas = schemas, lang = lang, variables = variables)
   # text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
   #                      data = data, time = time_formatted, schemas = schemas, lang = lang,
-  #                      top_scale = top_scale, variables = variables)
+  #                      top_scale = zoom_levels[[1]], variables = variables)
   #
   #
   # # Save the plot to a temporary file
@@ -93,15 +94,19 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
   # Timing db_get_helper
   db_get_start <- Sys.time()
   variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables
-                                     WHERE var_code IN (%s)
-                                     UNION
-                                     SELECT * FROM mtl.variables
-                                     WHERE var_code IN (
-                                     SELECT parent_vec
-                                     FROM mtl.variables
-                                     WHERE var_code IN (%s)
-                                     )
-                                     ", var_vec, var_vec))
+        WHERE var_code IN (%s)
+        UNION
+        SELECT * FROM mtl.variables
+        WHERE var_code IN (
+            SELECT
+                CASE
+                    WHEN parent_vec = 'households' THEN 'private_households'
+                    WHEN parent_vec = 'population' THEN 'c_population'
+                    ELSE parent_vec
+                END
+            FROM mtl.variables
+            WHERE var_code IN (%s)
+        )", var_vec, var_vec))
   db_get_end <- Sys.time()
 
   # Timing vars_build
@@ -132,8 +137,15 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
   explore_text_start <- Sys.time()
   text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
                        data = data, time = time_formatted, schemas = schemas, lang = lang,
-                       top_scale = top_scale, variables = variables)
+                       top_scale = zoom_levels[[1]], variables = variables)
   explore_text_end <- Sys.time()
+
+  # Map colors
+  map_colors_start <- Sys.time()
+  map_colors <- data_get_colours(vars = vars, region = region, time = time_formatted,
+                                 zoom_levels = zoom_levels, variables = variables,
+                                 schemas = schemas)
+  map_colors_end <- Sys.time()
 
   # Timing legend file save
   legend_save_start <- Sys.time()
@@ -164,6 +176,7 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
     explore_text = explore_text_end - explore_text_start,
     legend_save = legend_save_end - legend_save_start,
     graph_save = graph_save_end - graph_save_start,
+    map_colors = map_colors_end - map_colors_start,
     total = end_time - start_time
   )
   timing <- lapply(timing, as.numeric)
@@ -172,6 +185,7 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
     legend = base64enc::base64encode(legend_file),
     graph = base64enc::base64encode(graph_file),
     text = text,
+    map_colors = map_colors,
     timing = timing
   ))
 }

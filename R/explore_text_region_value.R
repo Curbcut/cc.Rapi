@@ -169,6 +169,8 @@ region_value_data_grab <- function(var, data, time, scale, region, col, schemas 
                                    variables) {
   # Get the parent variable
   parent_string <- var_get_info(var, variables = variables, what = "parent_vec")
+  if (parent_string == "population") parent_string <- "c_population"
+  if (parent_string == "households") parent_string <- "private_households"
 
   # Grab parent data
   if ("count" %in% class(var)) {

@@ -332,10 +332,9 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   )]
 
   # Calculate breaks
-  data_val <- data[-1]
+  data_val <- data[!names(data) %in% c("ID", "scale")]
   breaks_var <- variables$breaks_var[variables$var_code == var]
-  dat_no_id <- data[names(data) != "ID"]
-  if (is.na(breaks_var)) breaks_var <- names(dat_no_id[ncol(dat_no_id)])
+  if (is.na(breaks_var)) breaks_var <- names(data_val[ncol(data_val)])
   data_vec <- data[[breaks_var]]
   data_vec <- data_vec[!is.na(data_vec)]
   # Add it to the next data attributes
