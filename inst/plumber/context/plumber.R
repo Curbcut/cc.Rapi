@@ -4,6 +4,31 @@
 # Initialize database pool
 db_pool <<- cc.Rapi::db_connection()
 
+# Enable CORS Filtering
+#' @filter cors
+cors <- function(req, res) {
+
+  # This really works!
+  safe_domains <- c("http://localhost:3000",
+                    "https://main.d1siyubu8xsn5n.amplifyapp.com",
+                    "https://productiondomain.com")
+
+  if (any(grepl(pattern = paste0(safe_domains,collapse="|"), req$HTTP_REFERER,ignore.case=T))) {
+    res$setHeader("Access-Control-Allow-Origin", sub("/$","",req$HTTP_REFERER)) #Have to remove last slash, for some reason
+
+    if (req$REQUEST_METHOD == "OPTIONS") {
+      res$setHeader("Access-Control-Allow-Methods","GET,HEAD,PUT,PATCH,POST,DELETE") #This is how node.js does it
+      res$setHeader("Access-Control-Allow-Headers", req$HTTP_ACCESS_CONTROL_REQUEST_HEADERS)
+      res$status <- 200
+      return(list())
+    } else {
+      plumber::forward()
+    }
+  } else {
+    plumber::forward()
+  }
+}
+
 #* Send context (legend, graph, text)
 #* @param var_left etc
 #* @param var_right etc
