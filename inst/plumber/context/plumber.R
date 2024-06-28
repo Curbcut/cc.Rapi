@@ -10,6 +10,7 @@ cors <- function(req, res) {
 
   # This really works!
   safe_domains <- c("http://localhost:3000",
+                    "http://localhost:8000",
                     "https://main.d1siyubu8xsn5n.amplifyapp.com",
                     "https://productiondomain.com")
 
