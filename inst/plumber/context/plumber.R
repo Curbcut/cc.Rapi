@@ -11,7 +11,8 @@ cors <- function(req, res) {
   # This really works!
   safe_domains <- c("http://localhost:3000",
                     "http://localhost:8000",
-                    "https://main.d1siyubu8xsn5n.amplifyapp.com",
+                    "https://main.d1siyubu8xsn5n.amplifyapp.com", # rapi-frontend
+                    "https://main.dlfdwv74s9cmj.amplifyapp.com/", # summercs2024
                     "https://productiondomain.com")
 
   if (any(grepl(pattern = paste0(safe_domains,collapse="|"), req$HTTP_REFERER,ignore.case=T))) {
