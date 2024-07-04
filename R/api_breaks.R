@@ -31,6 +31,7 @@ api_breaks <- function(var_left, var_right = " ", scale, time, region = NULL) {
   end_time - start_time
 
   return(list(
-    breaks = attr(data, "breaks_var_left")
+    breaks = attr(data, "breaks_var_left"),
+    timing = list(breaks = end_time - start_time)
   ))
 }
