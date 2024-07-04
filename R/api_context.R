@@ -10,7 +10,7 @@
 # db_pool <- db_connection()
 
 
-# Generate Contextual Information for a Curbcut page
+#' Generate Contextual Information for a Curbcut page
 #'
 #' This function generates contextual information such as legend, graph, and text
 #' for the application based on provided parameters. It fetches variables from
@@ -29,62 +29,10 @@
 #'
 #' @return A list containing three components.
 #' @export
-context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
+api_context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
                     lang = NULL, zoom_levels,
                     schemas = list(var_left = list(time = time),
                                    var_right = list(time = time))) {
-
-  # var_vec <- var_left
-  # if (var_right != " ") var_vec <- c(var_left, var_right)
-  # var_vec <- paste(sprintf("'%s'", var_vec), collapse = ", ")
-  #
-  # # Execute the query using db_get_helper
-  # variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables
-  #                                    WHERE var_code IN (%s)
-  #                                    UNION
-  #                                    SELECT * FROM mtl.variables
-  #                                    WHERE var_code IN (
-  #                                    SELECT parent_vec
-  #                                    FROM mtl.variables
-  #                                    WHERE var_code IN (%s)
-  #                                    )
-  #                                    ", var_vec, var_vec))
-  #
-  # vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
-  # time_formatted <- vars$time
-  # vars <- vars$vars
-  # data <- data_get(vars, scale, region, variables = variables)
-  #
-  # legend <- legend_render(vars = vars, scale = scale, data = data, variables = variables)
-  # graph <- explore_graph(vars = vars, select_id = select_id, scale = scale, data = data,
-  #                        time = time_formatted, schemas = schemas, lang = lang, variables = variables)
-  # text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
-  #                      data = data, time = time_formatted, schemas = schemas, lang = lang,
-  #                      top_scale = zoom_levels[[1]], variables = variables)
-  #
-  #
-  # # Save the plot to a temporary file
-  # legend_file <- tempfile(fileext = ".png")
-  # # Calculate the dimensions in inches, given that 1 inch is 96 pixels
-  # width_in <- 268 / 96
-  # height_in <- 60 / 96
-  # # Save the plot with specified dimensions
-  # ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
-  #                 height = height_in, units = "in", dpi = 96)
-  #
-  # # Save the plot to a temporary file
-  # graph_file <- tempfile(fileext = ".png")
-  # # Calculate the dimensions in inches, given that 1 inch is 96 pixels
-  # width_in <- 268 / 96
-  # height_in <- 150 / 96
-  # # Save the plot with specified dimensions
-  # ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
-  #                 height = height_in, units = "in", dpi = 96)
-  #
-  # return(list(legend = base64enc::base64encode(legend_file),
-  #             graph = base64enc::base64encode(graph_file),
-  #             text = text))
-
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -204,7 +152,7 @@ context <- function(var_left, var_right = " ", scale, region = NULL, time, selec
 #' @return This function does not return a value. It starts the Plumber API server.
 #' @export
 run_api <- function(host = "127.0.0.1", port = 8000) {
-  api <- plumber::plumb_api("cc.Rapi", "context")
+  api <- plumber::plumb_api("cc.Rapi", "api")
 
   api$registerHooks(list(
     exit = function() {

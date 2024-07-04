@@ -46,9 +46,26 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
 
   tryCatch({
-    cc.Rapi::context(var_left = var_left, var_right = var_right, scale = scale,
+    cc.Rapi::api_context(var_left = var_left, var_right = var_right, scale = scale,
                      region = region, time = time, select_id = select_id,
                      zoom_levels = zoom_levels, lang = lang, schemas = schemas)
+  }, error = function(e) {
+    # Handle individual query error
+    list(error = paste("500 - Internal server error:", e$message))
+  })
+}
+
+#* Send context (legend, graph, text)
+#* @param var_left etc
+#* @param var_right etc
+#* @param scale etc
+#* @param region etc
+#* @get /breaks
+function(var_left, var_right = " ", scale, time, region = NULL) {
+
+  tryCatch({
+    cc.Rapi::api_breaks(var_left = var_left, var_right = var_right, scale = scale,
+               time = time, region = region)
   }, error = function(e) {
     # Handle individual query error
     list(error = paste("500 - Internal server error:", e$message))
@@ -62,4 +79,3 @@ function(res) {
   res$status <- 200
   list(message = "Welcome to the Curbcut Rapi")
 }
-
