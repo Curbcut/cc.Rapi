@@ -8,7 +8,7 @@
 #'
 #' @return A list containing three components.
 #' @export
-api_breaks <- function(var_left, var_right = " ", scale, time, region = NULL) {
+api_breaks <- function(var_left, var_right = " ", scale, region = NULL) {
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -17,6 +17,8 @@ api_breaks <- function(var_left, var_right = " ", scale, time, region = NULL) {
 
   # Timing db_get_helper
   variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables WHERE var_code IN (%s)", var_vec))
+  time <- variables$dates[[1]]
+  time <- time[length(time)]
 
   # Timing vars_build
   vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
@@ -28,10 +30,9 @@ api_breaks <- function(var_left, var_right = " ", scale, time, region = NULL) {
   data <- data_get(vars, scale, region, variables = variables)
 
   end_time <- Sys.time()
-  end_time - start_time
 
   return(list(
     breaks = attr(data, "breaks_var_left"),
-    timing = list(breaks = end_time - start_time)
+    timing = list(breaks = as.numeric(end_time - start_time))
   ))
 }

@@ -4,7 +4,7 @@
 \alias{api_breaks}
 \title{Generate breaks for a Curbcut page}
 \usage{
-api_breaks(var_left, var_right = " ", scale, time, region = NULL)
+api_breaks(var_left, var_right = " ", scale, region = NULL)
 }
 \arguments{
 \item{var_left}{<\code{character}>}
@@ -13,9 +13,9 @@ api_breaks(var_left, var_right = " ", scale, time, region = NULL)
 
 \item{scale}{<\code{character}>}
 
-\item{time}{<\code{character}>}
-
 \item{region}{<\code{character}>}
+
+\item{time}{<\code{character}>}
 }
 \value{
 A list containing three components.
