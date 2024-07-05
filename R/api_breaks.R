@@ -20,7 +20,7 @@ api_breaks <- function(var_left, var_right = " ", scale, region = NULL) {
   time <- time[length(time)]
 
   # Timing vars_build
-  vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
+  vars <- vars_build(var_left, var_right = " ", scale, time = time, variables = variables)
 
   time_formatted <- vars$time
   vars <- vars$vars
