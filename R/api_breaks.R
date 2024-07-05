@@ -3,7 +3,6 @@
 #' @param var_left <`character`>
 #' @param var_right <`character`>
 #' @param scale <`character`>
-#' @param time <`character`>
 #' @param region <`character`>
 #'
 #' @return A list containing three components.

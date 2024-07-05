@@ -14,8 +14,6 @@ api_breaks(var_left, var_right = " ", scale, region = NULL)
 \item{scale}{<\code{character}>}
 
 \item{region}{<\code{character}>}
-
-\item{time}{<\code{character}>}
 }
 \value{
 A list containing three components.

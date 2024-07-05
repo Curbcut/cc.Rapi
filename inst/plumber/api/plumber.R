@@ -62,11 +62,11 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
 #* @param scale etc
 #* @param region etc
 #* @get /breaks
-function(var_left, var_right = " ", scale, time, region = NULL) {
+function(var_left, var_right = " ", scale, region = NULL) {
 
   tryCatch({
     cc.Rapi::api_breaks(var_left = var_left, var_right = var_right, scale = scale,
-               time = time, region = region)
+                        region = region)
   }, error = function(e) {
     # Handle individual query error
     list(error = paste("500 - Internal server error:", e$message))
