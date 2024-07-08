@@ -1,12 +1,13 @@
 # var_left <- c("alp")
 # var_right = " "
-# scale <- "DA"
-# region <- "CMA"
+# scale <- "CT"
+# region <- "city"
 # time <- 2021
 # select_id <- NA
 # schema <- "mtl"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))
+# zoom_levels <- c("CSD", "CT", "DA")
 # db_pool <- db_connection()
 
 
