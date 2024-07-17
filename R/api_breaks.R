@@ -2,12 +2,12 @@
 #'
 #' @param var_left <`character`>
 #' @param var_right <`character`>
-#' @param scale <`character`>
+#' @param zoom_levels <`character`>
 #' @param region <`character`>
 #'
 #' @return A list containing three components.
 #' @export
-api_breaks <- function(var_left, var_right = " ", scale, region = NULL) {
+api_breaks <- function(var_left, var_right = " ", zoom_levels, region = NULL) {
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -20,14 +20,14 @@ api_breaks <- function(var_left, var_right = " ", scale, region = NULL) {
   time <- time[length(time)]
 
   # Timing vars_build
-  vars <- vars_build(var_left, var_right = " ", scale[1], time = time,
+  vars <- vars_build(var_left, var_right = " ", zoom_levels[1], time = time,
                      variables = variables)
 
   time_formatted <- vars$time
   vars <- vars$vars
 
   # Timing data_get
-  data <- data_get(vars, scale, region, variables = variables, reduce = FALSE)
+  data <- data_get(vars, zoom_levels, region, variables = variables, reduce = FALSE)
   breaks <- lapply(data, attr, "breaks_var_left")
 
   end_time <- Sys.time()
