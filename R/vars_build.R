@@ -19,7 +19,7 @@ vars_build <- function(var_left, var_right = " ", scale, time, variables) {
 
   # Is everything valid? Return NULL if it's invalid.
   if (var_right != " ") {
-    if (!is_data_present_in_scale(var = var_right, scale = scale)) {
+    if (!is_data_present_in_scale(var = var_right, scale = scale, variables = variables)) {
       return(NULL)
     }
   }

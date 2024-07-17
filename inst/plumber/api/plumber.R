@@ -60,14 +60,14 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
 #* Send context (legend, graph, text)
 #* @param var_left etc
 #* @param var_right etc
-#* @param scale etc
+#* @param zoom_levels etc
 #* @param region etc
 #* @get /breaks
-function(var_left, var_right = " ", scale, region = NULL) {
-
+function(var_left, var_right = " ", zoom_levels, region = NULL) {
+  zoom_levels <- jsonlite::fromJSON(zoom_levels)
   tryCatch({
-    cc.Rapi::api_breaks(var_left = var_left, var_right = var_right, scale = scale,
-                        region = region)
+    cc.Rapi::api_breaks(var_left = var_left, var_right = var_right,
+                        zoom_levels = zoom_levels, region = region)
   }, error = function(e) {
     # Handle individual query error
     list(error = paste("500 - Internal server error:", e$message))

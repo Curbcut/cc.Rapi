@@ -925,34 +925,18 @@ filter_inrange <- function(data, col, range, select_id = NA) {
 #' Check if data is present in specified scale
 #'
 #' This function checks if a particular variable is present within a specified scale.
-#' It first retrieves a list of files associated with the scale. If the list is not
-#' available, it is assumed the variable is not present. Otherwise, it checks if
-#' the specified variable exists in the list of scale files.
 #'
 #' @param scale <`character`> The name of the scale for which the data presence
 #' is to be checked. It is expected to correspond to a variable containing a list
 #' of file names.
 #' @param var <`character`> The variable name to check for in the scale's file list.
+#' @param variables <`table`>
 #'
-#' @return <`logical`> Returns `TRUE` if the variable is found in the scale's file list,
-#' otherwise returns `FALSE`.
-is_data_present_in_scale <- function(var, scale) {
-
-  # Grab all the files available for that scale
-  scale_files <- get0(sprintf("%s_files", scale))
-
-  # If there is no vector available listing the files, consider the variable
-  # is not present. (It is most likely in a SQLite database)
-  if (is.null(scale_files)) {
-    return(FALSE)
-  }
-
-  # If the `var` is not in the vector of files
-  if (!var %in% scale_files) {
-    return(FALSE)
-  }
-
-  return(TRUE)
+#' @return <`logical`> Returns `TRUE` if the variable and scale is found together
+#' in the variables table
+is_data_present_in_scale <- function(var, scale, variables) {
+  avail_scales <- variables$avail_scale[variables$var_code == var][[1]]
+  scale %in% avail_scales
 }
 
 #' Convert time value to character representation

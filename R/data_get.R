@@ -62,6 +62,9 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
   if (sum(grepl("ID\\.\\.|scale\\.\\.", names(result))) > 0)
     result <- result[-grep("ID\\.\\.|scale\\.\\.", names(result))]
 
+  # # Go over potentially expected duplicated columns
+  # duplicate_ID <- grep("^ID$", names(result))
+
   return(result)
 
 }
@@ -197,23 +200,12 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 #' @export
 data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
     # If data isn't present, throw an empty tibble
-  if (!is_data_present_in_scale(var = vars$var_right, scale = scale)) {
+  if (!is_data_present_in_scale(var = vars$var_right, scale = scale, variables = variables)) {
     return(data.frame())
   }
 
   # Get var_left and var_right data
   data <- db_get_data_from_sql(unlist(vars), scale = scale, region = region)
-
-  # If there is more to schemas than time, that means there are many possibilities
-  # for right-hand variable.
-  vr_schemas <- attributes(vr)$schema
-  vr_schemas <- vr_schemas[names(vr_schemas) != "time"]
-  vr_brks_v <- attributes(vr)$breaks_var
-  var_right <- vars$var_right
-  for (s in vr_schemas) {
-    col <- which(s_extract(s, vr_brks_v) == s_extract(s, names(vr)))
-    vr <- vr[c(1, col)]
-  }
 
   # Append breaks
   all_data <- mapply(

@@ -33,7 +33,7 @@ api_breaks <- function(var_left, var_right = " ", zoom_levels, region = NULL) {
   end_time <- Sys.time()
 
   return(list(
-    breaks = jsonlite::toJSON(breaks),
+    breaks = breaks,
     timing = list(breaks = as.numeric(end_time - start_time))
   ))
 }

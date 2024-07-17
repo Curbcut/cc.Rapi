@@ -1,5 +1,5 @@
 # var_left <- c("alp")
-# var_right = " "
+# var_right = "housing_tenant"
 # scale <- "CT"
 # region <- "CMA"
 # time <- 2021
@@ -60,7 +60,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
 
   # Timing vars_build
   vars_build_start <- Sys.time()
-  vars <- vars_build(var_left, var_right = " ", scale, time, variables = variables)
+  vars <- vars_build(var_left, var_right, scale, time, variables = variables)
   vars_build_end <- Sys.time()
 
   time_formatted <- vars$time
