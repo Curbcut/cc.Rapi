@@ -20,18 +20,20 @@ api_breaks <- function(var_left, var_right = " ", scale, region = NULL) {
   time <- time[length(time)]
 
   # Timing vars_build
-  vars <- vars_build(var_left, var_right = " ", scale, time = time, variables = variables)
+  vars <- vars_build(var_left, var_right = " ", scale[1], time = time,
+                     variables = variables)
 
   time_formatted <- vars$time
   vars <- vars$vars
 
   # Timing data_get
-  data <- data_get(vars, scale, region, variables = variables)
+  data <- data_get(vars, scale, region, variables = variables, reduce = FALSE)
+  breaks <- lapply(data, attr, "breaks_var_left")
 
   end_time <- Sys.time()
 
   return(list(
-    breaks = attr(data, "breaks_var_left"),
+    breaks = jsonlite::toJSON(breaks),
     timing = list(breaks = as.numeric(end_time - start_time))
   ))
 }

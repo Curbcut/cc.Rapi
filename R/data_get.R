@@ -157,8 +157,11 @@ data_get <- function(vars, scale, region, variables, ...) {
 #' @describeIn data_get The method for q5.
 #' @param vl_vr <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
+#' @param reduce <`logical`> Should the dataframe be reduced to a single table
+#' (if there are multiple scales)
 #' @export
-data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left", ...) {
+data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left",
+                        reduce = TRUE, ...) {
   # Get data
   data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region)
 
@@ -166,9 +169,9 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 
   # So that it works as a single SQL call for map coloring, we will iterate over
   # scales here.
-  data_scales <- split(data, data$scale)
+  data <- split(data, data$scale)
 
-  data_scales <- lapply(data_scales, \(data) {
+  data <- lapply(data, \(data) {
     data_append_breaks(
       var = vars$var_left,
       data = data,
@@ -178,8 +181,11 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
     )
   })
 
+  # Grab only data
+  data <- lapply(data, `[[`, "data")
+
   # Bind, which won't have any effect if there's a single scale.
-  data <- Reduce(rbind, lapply(data_scales, `[[`, "data"))
+  if (reduce) data <- Reduce(rbind, data)
 
   # Return output
   return(data)

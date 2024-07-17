@@ -1,7 +1,7 @@
 # var_left <- c("alp")
 # var_right = " "
 # scale <- "CT"
-# region <- "city"
+# region <- "CMA"
 # time <- 2021
 # select_id <- NA
 # schema <- "mtl"
