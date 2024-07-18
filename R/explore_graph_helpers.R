@@ -28,7 +28,7 @@ explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NU
   theme_default <- list(
     ggplot2::theme_minimal(),
     ggplot2::theme(
-      text = ggplot2::element_text(family = font_family, size = 12),
+      text = ggplot2::element_text(family = font_family, size = 10),
       legend.position = "none",
       panel.grid.minor.x = ggplot2::element_blank(),
       panel.grid.major.x = ggplot2::element_blank(),
