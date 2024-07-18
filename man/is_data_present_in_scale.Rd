@@ -4,7 +4,7 @@
 \alias{is_data_present_in_scale}
 \title{Check if data is present in specified scale}
 \usage{
-is_data_present_in_scale(var, scale)
+is_data_present_in_scale(var, scale, variables)
 }
 \arguments{
 \item{var}{<\code{character}> The variable name to check for in the scale's file list.}
@@ -12,14 +12,13 @@ is_data_present_in_scale(var, scale)
 \item{scale}{<\code{character}> The name of the scale for which the data presence
 is to be checked. It is expected to correspond to a variable containing a list
 of file names.}
+
+\item{variables}{<\code{table}>}
 }
 \value{
-<\code{logical}> Returns \code{TRUE} if the variable is found in the scale's file list,
-otherwise returns \code{FALSE}.
+<\code{logical}> Returns \code{TRUE} if the variable and scale is found together
+in the variables table
 }
 \description{
 This function checks if a particular variable is present within a specified scale.
-It first retrieves a list of files associated with the scale. If the list is not
-available, it is assumed the variable is not present. Otherwise, it checks if
-the specified variable exists in the list of scale files.
 }

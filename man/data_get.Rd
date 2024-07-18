@@ -12,7 +12,15 @@
 \usage{
 data_get(vars, scale, region, variables, ...)
 
-\method{data_get}{q5}(vars, scale, region = NULL, variables, vl_vr = "var_left", ...)
+\method{data_get}{q5}(
+  vars,
+  scale,
+  region = NULL,
+  variables,
+  vl_vr = "var_left",
+  reduce = TRUE,
+  ...
+)
 
 \method{data_get}{bivar}(vars, scale, region, variables, schemas, ...)
 
@@ -40,6 +48,9 @@ both var_left and var_right, and any potential parent variable aswell.}
 
 \item{vl_vr}{<\code{character}> Is the parent data coming from the var_left
 or var_right? How should it be renamed.}
+
+\item{reduce}{<\code{logical}> Should the dataframe be reduced to a single table
+(if there are multiple scales)}
 
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
