@@ -274,7 +274,7 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
   if (length(other_vl_schemas) > 0) {
     for (i in possible_vl_times) {
       for (s in possible_other_schemas) {
-        vr_year <- var_closest_year(var_right, i)$closest_year
+        vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
         out <- paste(data[[sprintf("var_left_%s_%s_q3", s, i)]],
                      data[[sprintf("var_right_%s_q3", vr_year)]],
                      sep = " - "
@@ -284,7 +284,7 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
     }
   } else {
     for (i in possible_vl_times) {
-      vr_year <- var_closest_year(var_right, i, variables = variables)$closest_year
+      vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
 
       # Give it a try. Does this year exist? If not, use the default
       out <- if (!is.null(data[[sprintf("var_right_%s_q3", vr_year)]])) {
