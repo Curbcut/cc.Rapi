@@ -24,7 +24,7 @@ legend_get_info <- function(vars, font_family = "acidgrotesk-book",
   theme_default <- list(
     ggplot2::theme_minimal(),
     ggplot2::theme(
-      text = ggplot2::element_text(family = font_family, size = 10),
+      text = ggplot2::element_text(family = font_family, size = 9),
       legend.position = "none",
       panel.grid = ggplot2::element_blank()
     )

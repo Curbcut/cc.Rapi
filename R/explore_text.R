@@ -155,8 +155,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.bivar <- function(vars, region, select_id, scale, time, data,
                                schemas, top_scale,
-                               variables,
-                               lang = NULL, ...) {
+                               variables, lang = NULL, ...) {
   # Append date function helper
   append_date <- \(out) {
     date_1 <- time$var_left
@@ -341,9 +340,10 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   }
 
   # Scales
-  scales_dictionary <- get_from_globalenv("scales_dictionary")
-  scale_vec <- is_scale_in(scales_dictionary$scale, scale, vectorized = TRUE)
-  scale_plur <- cc_t(scales_dictionary$plur[scale_vec], lang = lang)
+  scale_plur <- db_get(select = c("plur"),
+                       from = "scales_dictionary", where = list(scale = scale),
+                       schema = "mtl")$plur |>
+    cc_t(lang = lang)
 
   # Correlation
   relation <- explore_text_bivar_correlation(
@@ -391,12 +391,14 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   # Explanations
   left_exp <- var_get_info(var = vars$var_left,
     what = "explanation_nodet",
-    translate = TRUE, lang = lang, schemas_col = schemas$var_left
+    translate = TRUE, lang = lang, schemas_col = schemas$var_left,
+    variables = variables
   ) |>
     explore_text_color(meaning = "left")
   right_exp <- var_get_info(var = vars$var_right,
     what = "explanation_nodet",
-    translate = TRUE, lang = lang, schemas_col = schemas$var_right
+    translate = TRUE, lang = lang, schemas_col = schemas$var_right,
+    variables = variables
   ) |>
     explore_text_color(meaning = "right") |>
     explore_text_bivar_right_var_default_schema(data, var = vars$var_right)

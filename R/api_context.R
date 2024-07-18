@@ -89,29 +89,29 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
                        top_scale = zoom_levels[[1]], variables = variables)
   explore_text_end <- Sys.time()
 
-  # Map colors
-  map_colors_start <- Sys.time()
-  map_colors <- data_get_colours(vars = vars, region = region, time = time_formatted,
-                                 zoom_levels = zoom_levels, variables = variables,
-                                 schemas = schemas)
-  map_colors_end <- Sys.time()
+  # # Map colors
+  # map_colors_start <- Sys.time()
+  # map_colors <- data_get_colours(vars = vars, region = region, time = time_formatted,
+  #                                zoom_levels = zoom_levels, variables = variables,
+  #                                schemas = schemas)
+  # map_colors_end <- Sys.time()
 
   # Timing legend file save
   legend_save_start <- Sys.time()
   legend_file <- tempfile(fileext = ".png")
-  width_in <- 268 / 96
-  height_in <- 60 / 96
+  width_in <- 268
+  height_in <- 60
   ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
-                  height = height_in, units = "in", dpi = 96)
+                  height = height_in, units = "px", dpi = 125)
   legend_save_end <- Sys.time()
 
   # Timing graph file save
   graph_save_start <- Sys.time()
   graph_file <- tempfile(fileext = ".png")
-  width_in <- 268 / 96
-  height_in <- 150 / 96
+  width_in <- 268
+  height_in <- 150
   ggplot2::ggsave(graph_file, plot = graph, device = "png", width = width_in,
-                  height = height_in, units = "in", dpi = 96)
+                  height = height_in, units = "px", dpi = 125)
   graph_save_end <- Sys.time()
 
   end_time <- Sys.time()
@@ -125,7 +125,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
     explore_text = explore_text_end - explore_text_start,
     legend_save = legend_save_end - legend_save_start,
     graph_save = graph_save_end - graph_save_start,
-    map_colors = map_colors_end - map_colors_start,
+    # map_colors = map_colors_end - map_colors_start,
     total = end_time - start_time
   )
   timing <- lapply(timing, as.numeric)
@@ -134,7 +134,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
     legend = base64enc::base64encode(legend_file),
     graph = base64enc::base64encode(graph_file),
     text = text,
-    map_colors = map_colors,
+    # map_colors = map_colors,
     timing = timing
   ))
 }

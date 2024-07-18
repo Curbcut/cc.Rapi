@@ -62,8 +62,17 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
   if (sum(grepl("ID\\.\\.|scale\\.\\.", names(result))) > 0)
     result <- result[-grep("ID\\.\\.|scale\\.\\.", names(result))]
 
-  # # Go over potentially expected duplicated columns
-  # duplicate_ID <- grep("^ID$", names(result))
+  # Go over potentially expected duplicated columns
+  duplicate_ID <- grep("^ID$", names(result))
+  if (length(duplicate_ID) > 1)
+    result <- result[-duplicate_ID[2:length(duplicate_ID)]]
+  duplicate_scale <- grep("^scale$", names(result))
+  if (length(duplicate_scale) > 1)
+    result <- result[-duplicate_scale[2:length(duplicate_scale)]]
+
+  # Remove scale..
+  if (sum(grepl("scale\\.", names(result))) > 0)
+    result <- result[-grep("scale\\.", names(result))]
 
   return(result)
 
@@ -199,7 +208,7 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
 data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
-    # If data isn't present, throw an empty tibble
+  # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale, variables = variables)) {
     return(data.frame())
   }
@@ -209,14 +218,13 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
 
   # Append breaks
   all_data <- mapply(
-    \(var, data, rename_col) {
+    \(var, rename_col) {
       data_append_breaks(
         var = var, data = data, q3_q5 = "q3",
         rename_col = rename_col,
         variables = variables
       )
     }, c(vars$var_left, vars$var_right),
-    list(vl, vr),
     c("var_left", "var_right"),
     SIMPLIFY = FALSE
   )
@@ -276,7 +284,7 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
     }
   } else {
     for (i in possible_vl_times) {
-      vr_year <- var_closest_year(var_right, i)$closest_year
+      vr_year <- var_closest_year(var_right, i, variables = variables)$closest_year
 
       # Give it a try. Does this year exist? If not, use the default
       out <- if (!is.null(data[[sprintf("var_right_%s_q3", vr_year)]])) {
