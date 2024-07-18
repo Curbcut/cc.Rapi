@@ -13,8 +13,7 @@ api_context(
   select_id,
   lang = NULL,
   zoom_levels,
-  schemas = list(var_left = list(time = time), var_right = list(time = time)),
-  dpi
+  schemas = list(var_left = list(time = time), var_right = list(time = time))
 )
 }
 \arguments{
