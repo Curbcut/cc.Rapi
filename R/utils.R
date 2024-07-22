@@ -953,8 +953,8 @@ is_data_present_in_scale <- function(var, scale, variables) {
 #' @return <`character`> Returns the name of the 'time_val' if its corresponding var in
 #' the `dates` column in the variables table is named. If  not named, returns 'time_val' itself.
 #' @export
-time_chr <- function(var, time_val) {
-  dates <- var_get_info(var, what = "dates")[[1]]
+time_chr <- function(var, time_val, variables) {
+  dates <- var_get_info(var, what = "dates", variables = variables)[[1]]
   if (is.null(names(dates))) return(time_val)
 
   # If dates is named, return the character

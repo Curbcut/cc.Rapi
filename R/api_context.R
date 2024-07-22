@@ -1,7 +1,7 @@
 # var_left <- c("alp")
-# var_right = "housing_tenant"
+# var_right = "access_foot_daycarespots"
 # scale <- "CT"
-# region <- "CMA"
+# region <- "island"
 # time <- 2021
 # select_id <- NA
 # schema <- "mtl"
@@ -58,6 +58,20 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
         )", var_vec, var_vec))
   db_get_end <- Sys.time()
 
+  # Update the var_right schema if it's needed.
+  if (var_right != " ") {
+    # By default, it will use the default break variable
+    brk_v <- variables$breaks_var[variables$var_code == var_right][[1]]
+    sch <- variables$schema[variables$var_code == var_right][[1]]
+    sch <- sch[names(sch) != "time"]
+    if (length(sch) > 0) {
+      for (i in names(sch)) {
+        schemas$var_right[[i]] <- s_extract(sch[[i]], brk_v)
+        schemas$var_right[[i]] <- gsub("^_|_$", "", schemas$var_right[[i]])
+      }
+    }
+  }
+
   # Timing vars_build
   vars_build_start <- Sys.time()
   vars <- vars_build(var_left, var_right, scale, time, variables = variables)
@@ -79,7 +93,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   # Timing explore_graph
   explore_graph_start <- Sys.time()
   graph <- explore_graph(vars = vars, select_id = select_id, scale = scale, data = data,
-                time = time_formatted, schemas = schemas, lang = lang, variables = variables)
+                         time = time_formatted, schemas = schemas, lang = lang, variables = variables)
   explore_graph_end <- Sys.time()
 
   # Timing explore_text
@@ -100,7 +114,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   legend_save_start <- Sys.time()
   legend_file <- tempfile(fileext = ".png")
   width_in <- 268
-  height_in <- if ("bivar" %in% class(vars)) 150 else 60
+  height_in <- if ("bivar" %in% class(vars)) 160 else 60
   ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
                   height = height_in, units = "px", dpi = 125)
   legend_save_end <- Sys.time()

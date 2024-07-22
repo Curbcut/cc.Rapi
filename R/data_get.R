@@ -216,15 +216,25 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
   # Get var_left and var_right data
   data <- db_get_data_from_sql(unlist(vars), scale = scale, region = region)
 
+  # Split data in var_left and var_right
+  data <- lapply(vars, \(v) {
+    this_var_name <- names(data)
+    for (s in variables$schema[variables$var_code == v][[1]]) {
+      this_var_name <- gsub(s, "", this_var_name)
+    }
+    data[this_var_name %in% c("ID", "scale", v)]
+  })
+
   # Append breaks
   all_data <- mapply(
-    \(var, rename_col) {
+    \(var, d, rename_col) {
       data_append_breaks(
-        var = var, data = data, q3_q5 = "q3",
+        var = var, data = d, q3_q5 = "q3",
         rename_col = rename_col,
         variables = variables
       )
     }, c(vars$var_left, vars$var_right),
+    data,
     c("var_left", "var_right"),
     SIMPLIFY = FALSE
   )
@@ -293,7 +303,10 @@ data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
               sep = " - "
         )
       } else {
-        removed_year <- gsub(attributes(vr)$schema$time, "", names(all_data[[2]]$data)[[2]])
+        vr <- variables$breaks_var[variables$var_code == vars$var_right]
+        removed_year <- gsub(attributes(data)$schema_var_right$time, "", vr)
+        removed_year <- gsub(vars$var_right, "var_right", removed_year)
+
         paste(data[[sprintf("var_left_%s_q3", i)]],
               data[[sprintf("%s_%s_q3", removed_year, vr_year)]],
               sep = " - "

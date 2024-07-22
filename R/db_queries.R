@@ -15,28 +15,28 @@
 db_operation <- function(what, args) {
   # Extract a connection from the pool
   db_pool <- get_from_globalenv("db_pool")
-  conn_checkout_start <- Sys.time()
+  # conn_checkout_start <- Sys.time()
   conn <- pool::poolCheckout(db_pool)
-  conn_checkout_end <- Sys.time()
+  # conn_checkout_end <- Sys.time()
 
   # Apply the query
-  query_start <- Sys.time()
+  # query_start <- Sys.time()
   out <- tryCatch(do.call(what, c(conn, args)),
                   error = function(e) {
                     pool::poolReturn(conn)
                     stop(e$message)
                   })
-  query_end <- Sys.time()
+  # query_end <- Sys.time()
 
   # Return the connection to the pool of connections
   pool::poolReturn(conn)
 
-  # Logging times
-  conn_checkout_time <- conn_checkout_end - conn_checkout_start
-  query_time <- query_end - query_start
-
-  message(sprintf("Connection checkout time: %f seconds", conn_checkout_time))
-  message(sprintf("Query execution time: %f seconds\n\n", query_time))
+  # # Logging times
+  # conn_checkout_time <- conn_checkout_end - conn_checkout_start
+  # query_time <- query_end - query_start
+  #
+  # message(sprintf("Connection checkout time: %f seconds", conn_checkout_time))
+  # message(sprintf("Query execution time: %f seconds\n\n", query_time))
 
   # Return the output of the query
   return(out)

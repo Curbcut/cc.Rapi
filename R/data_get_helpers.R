@@ -235,6 +235,12 @@ find_breaks_quintiles <- function(dist, q3_q5 = "q5") {
     # Create a "pretty" break ensuring it's different from the previous one
     new_break <- round(q[i] / round_base) * round_base
 
+    # Ensure there's always a value in the break
+    while (!(any(dist >= new_break & dist < q[i + 1]) || (i == length(q) && any(dist >= new_break)))) {
+      round_base <- round_base / 10
+      new_break <- round(q[i] / round_base) * round_base
+    }
+
     # If it's the first break and it's equal to zero, do nothing.
     # If the new break is the same as the previous one, decrease rounding base
     # until they are different
@@ -263,9 +269,9 @@ find_breaks_quintiles <- function(dist, q3_q5 = "q5") {
   # Make sure the order is lowest to highest
   breaks <- breaks[order(breaks)]
 
-
   return(breaks)
 }
+
 
 #' Find pretty q5 breaks
 #'
@@ -334,7 +340,10 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   # Calculate breaks
   data_val <- data[!names(data) %in% c("ID", "scale")]
   breaks_var <- variables$breaks_var[variables$var_code == var]
-  if (is.na(breaks_var)) breaks_var <- names(data_val[ncol(data_val)])
+  if (is.na(breaks_var)) {
+    recent <- max(variables$dates[variables$var_code == var][[1]])
+    breaks_var <- sprintf("%s_%s", var, recent)
+  }
   data_vec <- data[[breaks_var]]
   data_vec <- data_vec[!is.na(data_vec)]
   # Add it to the next data attributes

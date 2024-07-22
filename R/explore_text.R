@@ -119,7 +119,8 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     # Grab the explanation and capitalize the first letter
     exp <- var_get_info(vars$var_left, variables = variables,
       what = "explanation", translate = TRUE,
-      lang = lang, schemas_col = schemas$var_left
+      lang = lang, schemas_col = schemas$var_left,
+      variables = variables
     ) |>
       s_sentence()
 
@@ -278,7 +279,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
       # Grab the explanation
       exp <- var_get_info(var,
         what = "explanation", translate = TRUE, lang = lang,
-        schemas_col = schemas[[col]]
+        schemas_col = schemas[[col]],
+        variables = variables
       )
       if (col == "var_right") {
         exp <- explore_text_bivar_right_var_default_schema(exp, data, var = var)
@@ -355,13 +357,15 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
     # Explanations
     left_exp <- var_get_info(vars$var_left,
       what = "explanation",
-      translate = TRUE, lang = lang, schemas_col = schemas$var_left
+      translate = TRUE, lang = lang, schemas_col = schemas$var_left,
+      variables = variables
     ) |>
       explore_text_color(meaning = "left")
 
     right_exp <- var_get_info(vars$var_right,
       what = "explanation",
-      translate = TRUE, lang = lang, schemas_col = schemas$var_right
+      translate = TRUE, lang = lang, schemas_col = schemas$var_right,
+      variables = variables
     ) |>
       explore_text_color(meaning = "right") |>
       explore_text_bivar_right_var_default_schema(data, var = vars$var_right)
@@ -521,7 +525,8 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   }
   exp_nodet <- var_get_info(vars$var_left,
     what = "explanation_nodet", translate = TRUE,
-    lang = lang, schemas_col = schemas$var_left
+    lang = lang, schemas_col = schemas$var_left,
+    variables = variables
   )
   # If the explanation is a bullet point, switch to something more generic
   if (grepl("</ul>", exp_nodet)) {

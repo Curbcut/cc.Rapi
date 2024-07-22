@@ -4,7 +4,7 @@
 \alias{time_chr}
 \title{Convert time value to character representation}
 \usage{
-time_chr(var, time_val)
+time_chr(var, time_val, variables)
 }
 \arguments{
 \item{var}{<\verb{character vector}> String representing the code of the variable

@@ -104,7 +104,7 @@ var_get_info <- function(var, what = "var_title", translate = FALSE,
 
         # Special case if time needs to be seen as character
         if (sch == "time") {
-          value <- time_chr(var, value)
+          value <- time_chr(var, value, variables = variables)
         }
 
         scm <- sprintf("__%s__", sch)
