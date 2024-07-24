@@ -20,15 +20,6 @@ z <- lapply(page$var_right[[1]], \(var_right) {
 })
 rm(z)
 
-
-var_right <- "housing_tenant"
-date <- 2001
-api_context(var_left = "alp", var_right = var_right,
-            scale = "CT", region = "CMA", time = date,
-            select_id = NA, lang = NULL,
-            zoom_levels = c("CSD", "CT", "DA"))
-
-
 # Loop over all possible left_variable for housing
 page <- db_get(select = c("dates", "var_left"),
                from = "modules",

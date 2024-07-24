@@ -177,12 +177,11 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
   # Get data
   data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region)
 
-  # Append breaks
-
-  # So that it works as a single SQL call for map coloring, we will iterate over
+  # So that it works as a single SQL call for breaks, we will iterate over
   # scales here.
   data <- split(data, data$scale)
 
+  # Append breaks
   data <- lapply(data, \(data) {
     data_append_breaks(
       var = vars$var_left,
@@ -207,115 +206,129 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
-data_get.bivar <- function(vars, scale, region, variables, schemas, ...) {
+data_get.bivar <- function(vars, scale, region, variables, schemas,
+                           reduce = TRUE, ...) {
   # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale, variables = variables)) {
     return(data.frame())
   }
 
   # Get var_left and var_right data
-  data <- db_get_data_from_sql(unlist(vars), scale = scale, region = region)
+  data_sql <- db_get_data_from_sql(unlist(vars), scale = scale, region = region)
 
-  # Split data in var_left and var_right
-  data <- lapply(vars, \(v) {
-    this_var_name <- names(data)
-    for (s in variables$schema[variables$var_code == v][[1]]) {
-      this_var_name <- gsub(s, "", this_var_name)
+  # So that it works as a single SQL call for breaks, we will iterate over
+  # scales here.
+  data_split <- split(data_sql, data_sql$scale)
+  data <- lapply(data_split, \(data) {
+
+    # Split data in var_left and var_right
+    data <- lapply(vars, \(v) {
+      this_var_name <- names(data)
+      for (s in variables$schema[variables$var_code == v][[1]]) {
+        this_var_name <- gsub(s, "", this_var_name)
+      }
+      data[this_var_name %in% c("ID", "scale", v)]
+    })
+
+    # Append breaks
+    all_data <- mapply(
+      \(var, d, rename_col) {
+        data_append_breaks(
+          var = var, data = d, q3_q5 = "q3",
+          rename_col = rename_col,
+          variables = variables
+        )
+      }, c(vars$var_left, vars$var_right),
+      data,
+      c("var_left", "var_right"),
+      SIMPLIFY = FALSE
+    )
+
+    # Grab all the time of the var_left (which are going to be the possible
+    # value if `time`, as time usually follows the left variable)
+    time_regex <- unique(all_data[[1]]$attr$schema_var_left$time)
+    possible_vl_times <- grep(time_regex, names(all_data[[1]]$data), value = TRUE)
+    possible_vl_times <- s_extract(time_regex, possible_vl_times)
+    possible_vl_times <- unique(possible_vl_times)
+    possible_vl_times <- gsub("_", "", possible_vl_times)
+
+    # Possible other vl_schemas
+    other_vl_schemas <- all_data[[1]]$attr$schema_var_left
+    other_vl_schemas <- other_vl_schemas[names(other_vl_schemas) != "time"]
+    if (length(other_vl_schemas) > 0) {
+      possible_other_schemas <- NULL
+      for (i in names(other_vl_schemas)) {
+        sch_rege <- other_vl_schemas[[i]]
+        possible_other_schemas <- grep(sch_rege, names(all_data[[1]]$data), value = TRUE)
+        possible_other_schemas <- s_extract(sch_rege, possible_other_schemas)
+        possible_other_schemas <- gsub("_", "", possible_other_schemas)
+      }
     }
-    data[this_var_name %in% c("ID", "scale", v)]
+
+    # Keep left and right breaks
+    breaks_vl <- attr(all_data[[1]]$data, "breaks_var_left")
+    breaks_vr <- attr(all_data[[2]]$data, "breaks_var_right")
+
+    # Merge (remove scale from one first)
+    all_data[[2]]$data <- all_data[[2]]$data[names(all_data[[2]]$data) != "scale"]
+    data <- merge(all_data[[1]]$data, all_data[[2]]$data, by = "ID", all = TRUE)
+
+    # Re-add breaks
+    attr(data, "breaks_var_left") <- breaks_vl
+    attr(data, "breaks_var_right") <- breaks_vr
+
+    # Re-add the attributes
+    for (i in names(all_data[[1]]$attr)) {
+      attr(data, i) <- all_data[[1]]$attr[[i]]
+    }
+    for (i in names(all_data[[2]]$attr)) {
+      attr(data, i) <- all_data[[2]]$attr[[i]]
+    }
+
+    # Make the group columns, with the years (group_2016, group_2021, ...)
+    # If there are possible_other_schemas:
+    if (length(other_vl_schemas) > 0) {
+      for (i in possible_vl_times) {
+        for (s in possible_other_schemas) {
+          vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
+          out <- paste(data[[sprintf("var_left_%s_%s_q3", s, i)]],
+                       data[[sprintf("var_right_%s_q3", vr_year)]],
+                       sep = " - "
+          )
+          data[[sprintf("group_%s_%s", s, i)]] <- out
+        }
+      }
+    } else {
+      for (i in possible_vl_times) {
+        vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
+
+        # Give it a try. Does this year exist? If not, use the default
+        out <- if (!is.null(data[[sprintf("var_right_%s_q3", vr_year)]])) {
+          paste(data[[sprintf("var_left_%s_q3", i)]],
+                data[[sprintf("var_right_%s_q3", vr_year)]],
+                sep = " - "
+          )
+        } else {
+          vr <- variables$breaks_var[variables$var_code == vars$var_right]
+          removed_year <- gsub(attributes(data)$schema_var_right$time, "", vr)
+          removed_year <- gsub(vars$var_right, "var_right", removed_year)
+
+          paste(data[[sprintf("var_left_%s_q3", i)]],
+                data[[sprintf("%s_%s_q3", removed_year, vr_year)]],
+                sep = " - "
+          )
+        }
+
+        data[[sprintf("group_%s", i)]] <- out
+      }
+    }
+
+    data
+
   })
 
-  # Append breaks
-  all_data <- mapply(
-    \(var, d, rename_col) {
-      data_append_breaks(
-        var = var, data = d, q3_q5 = "q3",
-        rename_col = rename_col,
-        variables = variables
-      )
-    }, c(vars$var_left, vars$var_right),
-    data,
-    c("var_left", "var_right"),
-    SIMPLIFY = FALSE
-  )
-
-  # Grab all the time of the var_left (which are going to be the possible
-  # value if `time`, as time usually follows the left variable)
-  time_regex <- unique(all_data[[1]]$attr$schema_var_left$time)
-  possible_vl_times <- grep(time_regex, names(all_data[[1]]$data), value = TRUE)
-  possible_vl_times <- s_extract(time_regex, possible_vl_times)
-  possible_vl_times <- unique(possible_vl_times)
-  possible_vl_times <- gsub("_", "", possible_vl_times)
-
-  # Possible other vl_schemas
-  other_vl_schemas <- all_data[[1]]$attr$schema_var_left
-  other_vl_schemas <- other_vl_schemas[names(other_vl_schemas) != "time"]
-  if (length(other_vl_schemas) > 0) {
-    possible_other_schemas <- NULL
-    for (i in names(other_vl_schemas)) {
-      sch_rege <- other_vl_schemas[[i]]
-      possible_other_schemas <- grep(sch_rege, names(all_data[[1]]$data), value = TRUE)
-      possible_other_schemas <- s_extract(sch_rege, possible_other_schemas)
-      possible_other_schemas <- gsub("_", "", possible_other_schemas)
-    }
-  }
-
-  # Keep left and right breaks
-  breaks_vl <- attr(all_data[[1]]$data, "breaks_var_left")
-  breaks_vr <- attr(all_data[[2]]$data, "breaks_var_right")
-
-  # Merge
-  data <- merge(all_data[[1]]$data, all_data[[2]]$data, by = "ID", all = TRUE)
-
-  # Re-add breaks
-  attr(data, "breaks_var_left") <- breaks_vl
-  attr(data, "breaks_var_right") <- breaks_vr
-
-  # Re-add the attributes
-  for (i in names(all_data[[1]]$attr)) {
-    attr(data, i) <- all_data[[1]]$attr[[i]]
-  }
-  for (i in names(all_data[[2]]$attr)) {
-    attr(data, i) <- all_data[[2]]$attr[[i]]
-  }
-
-  # Make the group columns, with the years (group_2016, group_2021, ...)
-  # If there are possible_other_schemas:
-  if (length(other_vl_schemas) > 0) {
-    for (i in possible_vl_times) {
-      for (s in possible_other_schemas) {
-        vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
-        out <- paste(data[[sprintf("var_left_%s_%s_q3", s, i)]],
-                     data[[sprintf("var_right_%s_q3", vr_year)]],
-                     sep = " - "
-        )
-        data[[sprintf("group_%s_%s", s, i)]] <- out
-      }
-    }
-  } else {
-    for (i in possible_vl_times) {
-      vr_year <- var_closest_year(vars$var_right, i, variables = variables)$closest_year
-
-      # Give it a try. Does this year exist? If not, use the default
-      out <- if (!is.null(data[[sprintf("var_right_%s_q3", vr_year)]])) {
-        paste(data[[sprintf("var_left_%s_q3", i)]],
-              data[[sprintf("var_right_%s_q3", vr_year)]],
-              sep = " - "
-        )
-      } else {
-        vr <- variables$breaks_var[variables$var_code == vars$var_right]
-        removed_year <- gsub(attributes(data)$schema_var_right$time, "", vr)
-        removed_year <- gsub(vars$var_right, "var_right", removed_year)
-
-        paste(data[[sprintf("var_left_%s_q3", i)]],
-              data[[sprintf("%s_%s_q3", removed_year, vr_year)]],
-              sep = " - "
-        )
-      }
-
-      data[[sprintf("group_%s", i)]] <- out
-    }
-  }
+  # Bind, which won't have any effect if there's a single scale.
+  if (reduce) data <- Reduce(rbind, data)
 
   # Return
   return(data)

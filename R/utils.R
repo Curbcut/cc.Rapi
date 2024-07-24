@@ -936,7 +936,7 @@ filter_inrange <- function(data, col, range, select_id = NA) {
 #' in the variables table
 is_data_present_in_scale <- function(var, scale, variables) {
   avail_scales <- variables$avail_scale[variables$var_code == var][[1]]
-  scale %in% avail_scales
+  all(scale %in% avail_scales)
 }
 
 #' Convert time value to character representation
