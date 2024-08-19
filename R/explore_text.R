@@ -119,8 +119,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     # Grab the explanation and capitalize the first letter
     exp <- var_get_info(vars$var_left, variables = variables,
       what = "explanation", translate = TRUE,
-      lang = lang, schemas_col = schemas$var_left,
-      variables = variables
+      lang = lang, schemas_col = schemas$var_left
     ) |>
       s_sentence()
 

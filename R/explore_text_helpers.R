@@ -723,10 +723,17 @@ explore_text_check_na <- function(context, variables, data, select_id, vars, tim
   # delta columns instead of the time columns.
   vl <- match_schema_to_col(data = data, time = time, col = "var_left", schemas = schemas)
   if (length(vl) == 2) vl <- "var_left"
-  vr <- match_schema_to_col(data = data, time = time, col = "var_right", schemas = schemas)
-  if (length(vl) == 2) vl <- "var_right"
+  if (vars$var_right != " ") {
+    vr <- match_schema_to_col(data = data, time = time, col = "var_right", schemas = schemas)
+    if (length(vr) == 2) vr <- "var_right"
+  } else {
+    vr <- NULL
+  }
+
 
   out <- lapply(c(vl, vr), \(col) {
+    if (is.null(col)) return(NULL)
+
     if (!col %in% names(data)) {
       return(NULL)
     }

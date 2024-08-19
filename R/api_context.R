@@ -1,5 +1,5 @@
 # var_left <- c("alp")
-# var_right = "access_foot_daycarespots"
+# var_right = " "
 # scale <- "CT"
 # region <- "island"
 # time <- 2021
