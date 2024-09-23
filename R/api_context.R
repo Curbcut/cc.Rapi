@@ -1,9 +1,9 @@
 # var_left <- c("alp")
-# var_right = " "
+# var_right = "housing_tenant"
 # scale <- "CT"
-# region <- "island"
+# region <- "CMA"
 # time <- 2021
-# select_id <- NA
+# select_id <- "4620013.00"
 # schema <- "mtl"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))

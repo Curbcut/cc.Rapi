@@ -218,7 +218,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
       var = vars$var_left, region = region,
       select_id = select_id, data = data, time = time,
       scale = scale, lang = lang,
-      col = "var_left", schemas = schemas
+      col = "var_left", schemas = schemas,
+      variables = variables
     )
 
     # Grab the value string
@@ -226,7 +227,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
       var = vars$var_right, region = region,
       select_id = select_id, data = data,
       scale = scale, time = time,
-      col = "var_right", lang = lang, schemas = schemas
+      col = "var_right", lang = lang, schemas = schemas,
+      variables = variables
     )
 
     # Add the coloring
@@ -272,7 +274,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
         col = col,
         lang = lang,
         time_col = time[[col]],
-        schemas = schemas
+        schemas = schemas,
+        variables = variables
       )
 
       # Grab the explanation
