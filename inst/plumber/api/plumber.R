@@ -46,6 +46,7 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
            list(var_left = list(time = time), var_right = list(time = time)))) {
   schemas <- jsonlite::fromJSON(schemas)
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
+  select_id <- as.character(select_id)
 
   tryCatch({
     cc.Rapi::api_context(var_left = var_left, var_right = var_right, scale = scale,
