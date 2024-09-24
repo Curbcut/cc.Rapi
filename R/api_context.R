@@ -113,7 +113,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   # Timing legend file save
   legend_save_start <- Sys.time()
   legend_file <- tempfile(fileext = ".png")
-  width_in <- 268
+  width_in <- 260
   height_in <- if ("bivar" %in% class(vars)) 160 else 60
   ggplot2::ggsave(legend_file, plot = legend, device = "png", width = width_in,
                   height = height_in, units = "px", dpi = 125)
