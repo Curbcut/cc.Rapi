@@ -35,8 +35,7 @@ explore_graph_q5_ind <- function(vars, select_id, scale, data, time, schemas,
 #' @rdname explore_graph_q5_ind
 #' @export
 explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, schemas,
-                                        variables,
-                                        lang = NULL,
+                                        variables, lang = NULL,
                                         font_family = "acidgrotesk-book",
                                         val = NULL, ...) {
   # Appease R CMD check
@@ -46,7 +45,8 @@ explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, sche
   shared_info <- explore_graph_info(
     vars = vars, font_family = font_family,
     scales_as_DA = scales_as_DA, select_id = select_id,
-    data = data, lang = lang, scale = scale, variables = variables
+    data = data, lang = lang, scale = scale, variables = variables,
+    time = time, ...
   )
 
   # Color as function

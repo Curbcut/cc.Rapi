@@ -16,6 +16,7 @@ explore_text_delta_exp(
   data,
   schemas,
   lang,
+  variables,
   ...
 )
 
@@ -29,6 +30,7 @@ explore_text_delta_exp(
   data,
   schemas,
   lang,
+  variables,
   val = NULL,
   ...
 )
@@ -43,6 +45,7 @@ explore_text_delta_exp(
   data,
   schemas,
   lang,
+  variables,
   single_val = FALSE,
   ...
 )
@@ -73,6 +76,8 @@ and ID. The output of \code{\link{data_get}}.}
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.}
 
 \item{lang}{<\code{character}> Language for translation.}
+
+\item{variables}{<``>}
 
 \item{...}{Additional arguments passed to the dispatched method.}
 

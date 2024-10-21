@@ -1,14 +1,15 @@
 # var_left <- c("alp")
-# var_right = "housing_tenant"
+# var_right = " "
 # scale <- "CT"
 # region <- "CMA"
 # time <- 2021
-# select_id <- "4620013.00"
+# select_id <- "4620062.00"
 # schema <- "mtl"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))
-# zoom_levels <- c("CSD", "CT", "DA")
+# zoom_levels <- c("boroughCSD", "CT", "DA")
 # db_pool <- db_connection()
+# font_family <-  "acidgrotesk-book"
 
 
 #' Generate Contextual Information for a Curbcut page
@@ -82,12 +83,14 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
 
   # Timing data_get
   data_get_start <- Sys.time()
-  data <- data_get(vars, scale, region, variables = variables)
+  data <- data_get(vars, scale, region, variables = variables, time = time_formatted,
+                   schemas = schemas)
   data_get_end <- Sys.time()
 
   # Timing legend_render
   legend_render_start <- Sys.time()
-  legend <- legend_render(vars = vars, scale = scale, data = data, variables = variables)
+  legend <- legend_render(vars = vars, scale = scale, data = data, variables = variables,
+                          time = time_formatted)
   legend_render_end <- Sys.time()
 
   # Timing explore_graph

@@ -64,9 +64,18 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
   name <- dat$name
   name_2 <- dat$name_2
   if (is.na(name_2)) {
-    name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "ID" = (
-                          SELECT "%s_ID" FROM %s."%s" WHERE "ID" = \'%s\')',
-                          "mtl", top_scale, top_scale, "mtl", scale, select_id))$name
+    name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "ID"::text = (
+              SELECT replace(
+                         CASE
+                             WHEN jsonb_typeof("%s_ID") = \'array\' THEN
+                                 ("%s_ID"->>0)::text
+                             ELSE
+                                 ("%s_ID"::text)
+                         END, \'"\', \'\')
+              FROM %s."%s"
+              WHERE "ID"::text = \'%s\')',
+              "mtl", top_scale, top_scale, top_scale, top_scale, "mtl", scale, select_id)
+    )$name
   }
   name_2 <- cc_t(name_2, lang = lang)
   heading <- cc_t(scale_df$place_heading, lang = lang)

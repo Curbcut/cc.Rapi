@@ -22,6 +22,7 @@
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @param lang <`character`> Language for translation.
 #' @param ... Additional arguments passed to the dispatched method.
+#' @param variables <``>
 #'
 #' @return A list with the following elements:
 #' \item{exp}{A character string describing the explanation of the variable}
@@ -31,7 +32,7 @@
 #' \code{region_vals}, containing the variable values formatted according
 #' to the class of `var`}
 explore_text_delta_exp <- function(var, region, select_id, left_right = "left",
-                                   time, scale, data, schemas, lang, ...) {
+                                   time, scale, data, schemas, lang, variables, ...) {
   UseMethod("explore_text_delta_exp", var)
 }
 
@@ -42,7 +43,7 @@ explore_text_delta_exp <- function(var, region, select_id, left_right = "left",
 #' for normal operations.
 #' @export
 explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "left",
-                                       time, scale, data, schemas, lang, val = NULL,
+                                       time, scale, data, schemas, lang, variables, val = NULL,
                                        ...) {
   # Grab values for single years. Allow for `apply`
   var_lr <- sprintf("var_%s", left_right)
@@ -54,17 +55,17 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
   # If there is no selection
   if (is.na(select_id)) {
     # Grab the parent variable
-    parent <- var_get_info(var = var[[1]], what = "parent_vec")
+    parent <- var_get_info(var = var[[1]], what = "parent_vec", variables = variables)
     parent <- cc_t(parent, lang = lang)
 
     # Grab the explanation
     exp_q5 <- var_get_info(
       var = var, what = "exp_q5", translate = TRUE,
-      lang = lang, schemas_col = schemas[[var_lr]]
+      lang = lang, schemas_col = schemas[[var_lr]], variables = variables
     )
 
     # Sub the placeholder for the two last brackets
-    breaks <- var_get_info(var = var, what = "rank_name")[[1]]
+    breaks <- var_get_info(var = var, what = "rank_name", variables = variables)[[1]]
     two_last_ranks <- breaks[4:5]
     two_last_ranks <- sapply(two_last_ranks, cc_t, lang = lang)
     two_last_ranks <- tolower(two_last_ranks)
@@ -86,7 +87,8 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
           scale = scale,
           col = var_lr,
           lang = lang,
-          time = t
+          time = t,
+          variables = variables
         )
       })
     region_vals <- sapply(region_vals, `[[`, "val")
@@ -108,7 +110,7 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
   # If there is a selection
   exp <- var_get_info(
     var = var, what = "explanation", translate = TRUE,
-    lang = lang, schemas_col = schemas[[var_lr]]
+    lang = lang, schemas_col = schemas[[var_lr]], variables = variables
   )
   if (grepl("</ul>", exp)) {
     out <- if (left_right == "left") {
@@ -157,7 +159,8 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
         col = var_lr,
         lang = lang,
         time = t,
-        val = v
+        val = v,
+        variables = variables
       )
     }, times, if (length(val) == 0) rep(list(NULL), 2) else val,  # In the case val is NULL, make `v` be NULL twice so not errors
     SIMPLIFY = FALSE, USE.NAMES = FALSE)
@@ -180,12 +183,13 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
 #' @param single_val <`logical`> Is it a comparison, or is it for a single delta?
 #' @export
 explore_text_delta_exp.default <- function(var, region, select_id, left_right = "left",
-                                           time, scale, data, schemas, lang, single_val = FALSE, ...) {
+                                           time, scale, data, schemas, lang, variables,
+                                           single_val = FALSE, ...) {
   var_lr <- sprintf("var_%s", left_right)
   # Grab the explanation
   exp <- var_get_info(var,
                       what = "explanation", translate = TRUE, lang = lang,
-                      schemas_col = schemas[[var_lr]]
+                      schemas_col = schemas[[var_lr]], variables = variables
   )
   if (grepl("</ul>", exp)) {
     out <- if (single_val) {
@@ -215,7 +219,8 @@ explore_text_delta_exp.default <- function(var, region, select_id, left_right = 
         scale = scale,
         col = var_lr,
         lang = lang,
-        time = t
+        time = t,
+        variables = variables
       )
     })
   region_vals <- sapply(region_values, `[[`, "val")

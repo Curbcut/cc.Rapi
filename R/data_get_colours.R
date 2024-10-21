@@ -51,7 +51,7 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
   # Is group already calculated?
   group <- match_schema_to_z_col(
     data = data, time = time, col = "group", vl_vr = "var_left",
-    schemas = schemas
+    schemas = schemas, variables = variables
   )
 
   if ("group" %in% names(data)) {
@@ -63,7 +63,7 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
       # Grab the correct column from which to use colors on
       var <- match_schema_to_col(
         data = data, time = time, col = "var_left",
-        schemas = schemas
+        schemas = schemas, variables = variables
       )
       group <- sprintf("%s_q5", var)
     }

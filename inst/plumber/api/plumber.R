@@ -44,6 +44,7 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
          lang = NULL, zoom_levels,
          schemas = jsonlite::toJSON(
            list(var_left = list(time = time), var_right = list(time = time)))) {
+  time <- jsonlite::fromJSON(time)
   schemas <- jsonlite::fromJSON(schemas)
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
   select_id <- as.character(select_id)
@@ -64,7 +65,8 @@ function(var_left, var_right = " ", scale, region, time, select_id = NA,
 #* @param zoom_levels etc
 #* @param region etc
 #* @get /breaks
-function(var_left, var_right = " ", zoom_levels, region = NULL) {
+function(var_left, var_right = " ", zoom_levels, time = NULL, region = NULL) {
+  time <- jsonlite::fromJSON(time)
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
   tryCatch({
     cc.Rapi::api_breaks(var_left = var_left, var_right = var_right,

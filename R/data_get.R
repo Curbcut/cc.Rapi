@@ -93,51 +93,76 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
 #' @param region <`character`> String of the region under study.
 #' @param vl_vr <`character`> Which of var_left or var_right is this delta supposed
 #' to be for. Defaults to var_left.
+#' @param reduce <`logical`> Should the dataframe be reduced to a single table
+#' (if there are multiple scales)
 #'
 #' @return A data frame with the following columns: ID, var_1, var_2, and var.
 #' `ID` is the ID column from the original data, `var_1` and `var_2` are the
 #' values of the two variables being compared, and `var` is the percentage
 #' change between the two variables.
-data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_left") {
+data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_left",
+                           reduce = TRUE) {
   # Grab the correct var/time
   var <- vars[[vl_vr]]
   time_col <- time[[vl_vr]]
 
   # Retrieve
-  data <- db_get_data(var = var, scale = scale, region = region)
+  data <- db_get_data_from_sql(var = var, scale = scale, region = region)
 
   # Calculate breaks for the right columns
+  data_schema <- variables$schema[variables$var_code == var][[1]]
+  attr(data, sprintf("schema_%s", vl_vr)) <- data_schema
+
   cols <- match_schema_to_col(data = data, time = time_col, col = var, schemas = NULL)
-  keep_cols <- c("ID", cols, attr(data, "breaks_var")) # keep the breaks_var and use it to calculate breaks
+  breaks_var <- variables$breaks_var[variables$var_code == var]
+  keep_cols <- c("ID", "scale", cols, if (!is.na(breaks_var)) breaks_var) # keep the breaks_var and use it to calculate breaks
   data <- data[unique(keep_cols)]
 
+  # So that it works as a single SQL call for breaks, we will iterate over
+  # scales here.
+  data <- split(data, data$scale)
+
   # Append breaks
-  data <- data_append_breaks(
-    var = var,
-    data = data,
-    q3_q5 = "q5",
-    rename_col = vl_vr,
-    variables = variables
-  )
-  data <- data$data
+  data <- lapply(data, \(data) {
+    data <- data_append_breaks(
+      var = var,
+      data = data,
+      q3_q5 = "q5",
+      rename_col = vl_vr,
+      variables = variables
+    )
+    data <- data$data
 
-  # Keep columns of the two years
-  cols <- match_schema_to_col(data = data, time = time_col, col = vl_vr, schemas = NULL)
-  data <- data[c("ID", grep(paste0(cols, collapse = "|"), names(data), value = TRUE))]
+    # Keep columns of the two years
+    cols <- match_schema_to_col(data = data, time = time_col, col = vl_vr,
+                                schemas = NULL)
 
-  # Calculate the relative difference
-  result <- (data[[3]] - data[[2]]) / data[[2]]
-  # Identify positions where data[[3]] is equal to data[[2]] and neither are NAs
-  equal_non_na <- !is.na(data[[3]]) & !is.na(data[[2]]) & data[[3]] == data[[2]]
-  # Set result to 0 where conditions are met
-  result[equal_non_na] <- 0
+    # Preserve attributes before subsetting
+    attrs <- attributes(data)
+    # Subset the data
+    data_subset <- data[c("ID", "scale", grep(paste0(cols, collapse = "|"), names(data), value = TRUE))]
+    # Restore the original attributes
+    attributes(data_subset) <- attrs
 
-  # Replace NaNs and infinite values with NA
-  data[[vl_vr]] <- result
-  data[[vl_vr]] <- replace(data[[vl_vr]], is.na(data[[vl_vr]]), NA)
-  data[[vl_vr]] <- replace(data[[vl_vr]], is.infinite(data[[vl_vr]]), NA)
+    # Calculate the relative difference
+    result <- (data[[4]] - data[[3]]) / data[[3]]
+    # Identify positions where data[[3]] is equal to data[[2]] and neither are NAs
+    equal_non_na <- !is.na(data[[4]]) & !is.na(data[[3]]) & data[[4]] == data[[3]]
+    # Set result to 0 where conditions are met
+    result[equal_non_na] <- 0
 
-  # Return
+    # Replace NaNs and infinite values with NA
+    data[[vl_vr]] <- result
+    data[[vl_vr]] <- replace(data[[vl_vr]], is.na(data[[vl_vr]]), NA)
+    data[[vl_vr]] <- replace(data[[vl_vr]], is.infinite(data[[vl_vr]]), NA)
+
+    data
+  })
+
+  # Bind, which won't have any effect if there's a single scale.
+  if (reduce) data <- Reduce(rbind, data)
+
+  # Return output
   return(data)
 }
 
@@ -156,6 +181,8 @@ data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_le
 #' @param region <`character vector`> Character of the region under study
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param reduce <`logical`> Should the dataframe be reduced to a single table
+#' (if there are multiple scales)
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A dataframe containing the data according to the class of `vars`,
@@ -169,8 +196,6 @@ data_get <- function(vars, scale, region, variables, ...) {
 #' @describeIn data_get The method for q5.
 #' @param vl_vr <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
-#' @param reduce <`logical`> Should the dataframe be reduced to a single table
-#' (if there are multiple scales)
 #' @export
 data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left",
                         reduce = TRUE, ...) {
@@ -338,10 +363,11 @@ data_get.bivar <- function(vars, scale, region, variables, schemas,
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @export
-data_get.delta <- function(vars, scale, region, variables, time, ...) {
+data_get.delta <- function(vars, scale, region, variables,
+                           reduce = TRUE, time, ...) {
   data_get_delta_fun(
     vars = vars, scale = scale, region = region, variables = variables,
-    time = time, ...
+    reduce = reduce, time = time, ...
   )
 }
 
@@ -356,89 +382,118 @@ data_get.delta <- function(vars, scale, region, variables, time, ...) {
 #' @param region <`character vector`> String of the region under study
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param reduce <`logical`> Should the dataframe be reduced to a single table
+#' (if there are multiple scales)
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @seealso \code{\link{data_get.delta}}
-data_get_delta_fun <- function(vars, scale, region, variables, time, ...) {
+data_get_delta_fun <- function(vars, scale, region, variables,
+                               reduce = TRUE, time, ...) {
   UseMethod("data_get_delta_fun", vars)
 }
 
 #' @describeIn data_get_delta_fun The method for scalar variables.
-data_get_delta_fun.scalar <- function(vars, scale, region, variables, time, ...) {
-  # Treat certain scales as DA
-  scale <- treat_to_DA(scale = scale)
+data_get_delta_fun.scalar <- function(vars, scale, region, variables, time,
+                                      reduce = TRUE, ...) {
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
-    scale = scale, variables = variables, region = region
+    scale = scale, variables = variables, region = region,
+    reduce = reduce
   )
 
-  # Is delta ONLY positive or ONLY negative? Inform which color scale to use
-  vec <- data$var_left
-  vec <- vec[!is.na(vec)]
-  current <- "normal"
-  if (all(vec >= 0)) current <- "positive" else if (all(vec <= 0)) current <- "negative"
-  class(data) <- c(current, class(data))
+  process_data <- \(data) {
+    # Is delta ONLY positive or ONLY negative? Inform which color scale to use
+    vec <- data$var_left
+    vec <- vec[!is.na(vec)]
+    current <- "normal"
+    if (all(vec >= 0)) current <- "positive" else if (all(vec <= 0)) current <- "negative"
+    class(data) <- c(current, class(data))
 
-  # Grab the breaks in the data
-  breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
+    # Grab the breaks in the data
+    breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
 
-  # Add the breaks attribute
-  attr(data, "breaks_var_left") <- breaks
+    # Add the breaks attribute
+    attr(data, "breaks_var_left") <- breaks
 
-  # Add the `group` for the map colouring
-  data$var_left_q5 <- 5
-  data$var_left_q5[data$var_left < breaks[5]] <- 4
-  data$var_left_q5[data$var_left < breaks[4]] <- 3
-  data$var_left_q5[data$var_left < breaks[3]] <- 2
-  data$var_left_q5[data$var_left < breaks[2]] <- 1
-  data$var_left_q5[is.na(data$var_left)] <- NA
-  data$group <- as.character(data$var_left_q5)
+    # Add the `group` for the map colouring
+    data$var_left_q5 <- 5
+    data$var_left_q5[data$var_left < breaks[5]] <- 4
+    data$var_left_q5[data$var_left < breaks[4]] <- 3
+    data$var_left_q5[data$var_left < breaks[3]] <- 2
+    data$var_left_q5[data$var_left < breaks[2]] <- 1
+    data$var_left_q5[is.na(data$var_left)] <- NA
+    data$group <- as.character(data$var_left_q5)
 
-  # Return
-  return(data)
+    # Return
+    return(data)
+  }
+
+  # Main function
+  if (reduce) {
+    data <- process_data(data)
+    return(data)
+  }
+
+  result <- lapply(data, process_data)
+
+  return(result)
 }
 
 #' @describeIn data_get_delta_fun The method for ordinal variables.
-data_get_delta_fun.ordinal <- function(vars, scale, region, variables, time, ...) {
+data_get_delta_fun.ordinal <- function(vars, scale, region, variables,
+                                       reduce = TRUE, time, ...) {
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
-    scale = scale, variables = variables, region = region
+    scale = scale, variables = variables, region = region,
+    reduce = reduce
   )
 
-  # Is delta ONLY positive or ONLY negative? Inform which color scale to use
-  vec <- data$var_left
-  vec <- vec[!is.na(vec)]
-  current <- "normal"
-  if (all(vec >= 0)) current <- "positive" else if (all(vec <= 0)) current <- "negative"
-  class(data) <- c(current, class(data))
+  process_data <- \(data) {
+    # Is delta ONLY positive or ONLY negative? Inform which color scale to use
+    vec <- data$var_left
+    vec <- vec[!is.na(vec)]
+    current <- "normal"
+    if (all(vec >= 0)) current <- "positive" else if (all(vec <= 0)) current <- "negative"
+    class(data) <- c(current, class(data))
 
-  # Grab the breaks in the data
-  breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
+    # Grab the breaks in the data
+    breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
 
-  # Add the breaks attribute
-  attr(data, "breaks_var_left") <- breaks
+    # Add the breaks attribute
+    attr(data, "breaks_var_left") <- breaks
 
-  # var_left_q5 will go off of bins change. 0 bin change vs 1 bin change vs multiple
-  # bin changes.
-  var_left_binchange <- data[[3]] - data[[2]]
+    # var_left_q5 will go off of bins change. 0 bin change vs 1 bin change vs multiple
+    # bin changes.
+    var_left_binchange <- data[[3]] - data[[2]]
 
-  # Add the `group` for the map colouring
-  data$var_left_q5 <- 5
-  data$var_left_q5[var_left_binchange == 1] <- 4
-  data$var_left_q5[var_left_binchange == 0] <- 3
-  data$var_left_q5[var_left_binchange == -1] <- 2
-  data$var_left_q5[var_left_binchange < -1] <- 1
-  data$var_left_q5[is.na(data$var_left)] <- NA
-  data$group <- as.character(data$var_left_q5)
+    # Add the `group` for the map colouring
+    data$var_left_q5 <- 5
+    data$var_left_q5[var_left_binchange == 1] <- 4
+    data$var_left_q5[var_left_binchange == 0] <- 3
+    data$var_left_q5[var_left_binchange == -1] <- 2
+    data$var_left_q5[var_left_binchange < -1] <- 1
+    data$var_left_q5[is.na(data$var_left)] <- NA
+    data$group <- as.character(data$var_left_q5)
 
-  # Return
-  return(data)
+    # Return
+    return(data)
+  }
+
+  # Main function
+  if (reduce) {
+    data <- process_data(data)
+    return(data)
+  }
+
+  result <- lapply(data, process_data)
+
+  return(result)
 }
 
 #' @describeIn data_get The method for bivar.

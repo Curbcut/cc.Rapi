@@ -73,8 +73,10 @@ explore_graph_delta_ind.ordinal <- function(vars, select_id, scale, data, time, 
   clr_df$fill[4] <- clr_df$fill[5]
 
   # Get the scales ggplot function
-  ycol <- match_schema_to_col(data = data, time = time$var_left[2], col = "var_left", schemas = schemas)
-  xcol <- match_schema_to_col(data = data, time = time$var_left[1], col = "var_left", schemas = schemas)
+  ycol <- match_schema_to_col(data = data, time = time$var_left[2],
+                              col = "var_left", schemas = schemas)
+  xcol <- match_schema_to_col(data = data, time = time$var_left[1],
+                              col = "var_left", schemas = schemas)
 
 
   x_scale <- explore_graph_scale(

@@ -23,10 +23,6 @@ Can also be a simple numeric.}
 
 \item{col}{<\code{character}> Which column should be extracted? \code{var_left} or \code{var_right}.}
 
-\item{data_schema}{<\verb{named list}> A list containing the schema information, specifically the
-'time' attribute. Typically obtained, and defaulted, as an attribute to
-\code{data} (output of \code{\link{data_get}}).}
-
 \item{schemas}{<\verb{named list}> Current schema information. The additional widget
 values that have an impact on which data column to pick. Usually \code{r[[id]]$schema()}.
 Can be NULL if there are none (ex. taking a parent variable, no schemas).}

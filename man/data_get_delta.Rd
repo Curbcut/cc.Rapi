@@ -4,7 +4,15 @@
 \alias{data_get_delta}
 \title{Calculate the percentage change between two variables over two years}
 \usage{
-data_get_delta(vars, time, scale, variables, region, vl_vr = "var_left")
+data_get_delta(
+  vars,
+  time,
+  scale,
+  variables,
+  region,
+  vl_vr = "var_left",
+  reduce = TRUE
+)
 }
 \arguments{
 \item{vars}{<\verb{character vector}> A var_code. The variable to get data for.}
@@ -22,6 +30,9 @@ both var_left and var_right, and any potential parent variable aswell.}
 
 \item{vl_vr}{<\code{character}> Which of var_left or var_right is this delta supposed
 to be for. Defaults to var_left.}
+
+\item{reduce}{<\code{logical}> Should the dataframe be reduced to a single table
+(if there are multiple scales)}
 }
 \value{
 A data frame with the following columns: ID, var_1, var_2, and var.

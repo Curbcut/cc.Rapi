@@ -744,9 +744,6 @@ hex_to_rgb_or_rgba <- function(hex) {
 #' A list for var_left and var_right. The output of \code{\link{vars_build}}(...)$time.
 #' Can also be a simple numeric.
 #' @param col <`character`> Which column should be extracted? `var_left` or `var_right`.
-#' @param data_schema <`named list`> A list containing the schema information, specifically the
-#' 'time' attribute. Typically obtained, and defaulted, as an attribute to
-#' `data` (output of \code{\link{data_get}}).
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' Can be NULL if there are none (ex. taking a parent variable, no schemas).
@@ -822,6 +819,7 @@ match_schema_to_col <- function(data, time, col = "var_left",
   # Return the var as a character
   return(var)
 }
+
 
 #' Match schema list to a specific column (`col`) in `data` based on `vl_vr` parameter
 #'

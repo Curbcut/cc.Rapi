@@ -24,7 +24,7 @@ data_get(vars, scale, region, variables, ...)
 
 \method{data_get}{bivar}(vars, scale, region, variables, schemas, reduce = TRUE, ...)
 
-\method{data_get}{delta}(vars, scale, region, variables, time, ...)
+\method{data_get}{delta}(vars, scale, region, variables, reduce = TRUE, time, ...)
 
 \method{data_get}{delta_bivar}(vars, scale, region, variables, time, ...)
 

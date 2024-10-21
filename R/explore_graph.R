@@ -297,8 +297,10 @@ explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
   clr_df <- delta_which_colors(data)
 
   # Get the scales ggplot function
-  ycol <- match_schema_to_col(data = data, time = time$var_left[2], col = "var_left", schemas = schemas)
-  xcol <- match_schema_to_col(data = data, time = time$var_left[1], col = "var_left", schemas = schemas)
+  ycol <- match_schema_to_col(data = data, time = time$var_left[2],
+                              col = "var_left", schemas = schemas)
+  xcol <- match_schema_to_col(data = data, time = time$var_left[1],
+                              col = "var_left", schemas = schemas)
 
 
   x_scale <- explore_graph_scale(

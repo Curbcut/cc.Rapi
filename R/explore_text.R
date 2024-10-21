@@ -491,7 +491,8 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
     scale = scale,
     left_right = "left", lang = lang,
     time = time, schemas = schemas, val = val,
-    single_val = TRUE
+    single_val = TRUE,
+    variables = variables
   )
 
   # Get the necessary information for the second paragraph

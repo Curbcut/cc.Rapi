@@ -6,11 +6,11 @@
 \alias{data_get_delta_fun.ordinal}
 \title{Inner function to get data based on the type of \code{vars}}
 \usage{
-data_get_delta_fun(vars, scale, region, variables, time, ...)
+data_get_delta_fun(vars, scale, region, variables, reduce = TRUE, time, ...)
 
-\method{data_get_delta_fun}{scalar}(vars, scale, region, variables, time, ...)
+\method{data_get_delta_fun}{scalar}(vars, scale, region, variables, time, reduce = TRUE, ...)
 
-\method{data_get_delta_fun}{ordinal}(vars, scale, region, variables, time, ...)
+\method{data_get_delta_fun}{ordinal}(vars, scale, region, variables, reduce = TRUE, time, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> Named list with a class. Object built using the
@@ -22,6 +22,9 @@ data_get_delta_fun(vars, scale, region, variables, time, ...)
 
 \item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
 both var_left and var_right, and any potential parent variable aswell.}
+
+\item{reduce}{<\code{logical}> Should the dataframe be reduced to a single table
+(if there are multiple scales)}
 
 \item{time}{<\verb{named list}> Object built using the \code{\link{vars_build}}
 function. It contains the time for both var_left and var_right variables.}
