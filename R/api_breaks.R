@@ -8,9 +8,8 @@
 #'
 #' @return A list containing three components.
 #' @export
-api_breaks <- function(var_left, var_right = " ", zoom_levels, time = NULL, region = NULL) {
+api_breaks <- function(var_left, var_right = " ", zoom_levels, time, region = NULL) {
 
-  if (length(time) == 1) stop("`time` should be sent to breaks API only on delta mode")
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -19,9 +18,9 @@ api_breaks <- function(var_left, var_right = " ", zoom_levels, time = NULL, regi
   variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables WHERE var_code IN (%s)", var_vec))
 
   # Timing db_get_helper
-  if (is.null(time)) {
+  if (length(time) != 2) {
     time <- variables$dates[[1]]
-    time <- time[length(time)]
+    time <- time[max(time)]
   }
 
 

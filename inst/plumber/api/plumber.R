@@ -70,7 +70,7 @@ function(var_left, var_right = " ", zoom_levels, time = NULL, region = NULL) {
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
   tryCatch({
     cc.Rapi::api_breaks(var_left = var_left, var_right = var_right,
-                        zoom_levels = zoom_levels, region = region)
+                        zoom_levels = zoom_levels, region = region, time = time)
   }, error = function(e) {
     # Handle individual query error
     list(error = paste("500 - Internal server error:", e$message))
