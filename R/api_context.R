@@ -2,8 +2,8 @@
 # var_right = " "
 # scale <- "CT"
 # region <- "CMA"
-# time <- 2021
-# select_id <- "4620062.00"
+# time <- c(2011, 2021)
+# select_id <- NA
 # schema <- "mtl"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))

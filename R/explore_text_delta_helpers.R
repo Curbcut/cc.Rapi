@@ -130,7 +130,8 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
     lang = lang,
     time_col = times[[1]],
     schemas = schemas,
-    val = val[[1]]
+    val = val[[1]],
+    variables = variables
   )$rank_chr
 
   rank_chr_after <- explore_text_selection_comparison(
@@ -141,7 +142,8 @@ explore_text_delta_exp.ind <- function(var, region, select_id, left_right = "lef
     lang = lang,
     time_col = times[[2]],
     schemas = schemas,
-    val = val[[2]]
+    val = val[[2]],
+    variables = variables
   )$rank_chr
 
   # Did it remain in the same category, or it moved?

@@ -537,6 +537,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   }
   relat <- explore_text_selection_comparison(
     var = vars$var_left,
+    variables = variables,
     data = data,
     select_id = select_id,
     col = "var_left",
@@ -662,6 +663,7 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
     # Get the information on how the selection compares
     relat_left <- explore_text_selection_comparison(
       data = data,
+      variables = variables,
       select_id = select_id,
       col = "var_left",
       ranks_override = c(
@@ -677,6 +679,7 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
     # Get the information on how the selection compares
     relat_right <- explore_text_selection_comparison(
       data = data,
+      variables = variables,
       select_id = select_id,
       col = "var_right",
       ranks_override = c(

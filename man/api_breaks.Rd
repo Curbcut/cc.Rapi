@@ -4,7 +4,7 @@
 \alias{api_breaks}
 \title{Generate breaks for a Curbcut page}
 \usage{
-api_breaks(var_left, var_right = " ", zoom_levels, time = NULL, region = NULL)
+api_breaks(var_left, var_right = " ", zoom_levels, time, region = NULL)
 }
 \arguments{
 \item{var_left}{<\code{character}>}

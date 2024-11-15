@@ -40,14 +40,13 @@ cors <- function(req, res) {
 #* @param time etc
 #* @param select_id etc
 #* @get /context
-function(var_left, var_right = " ", scale, region, time, select_id = NA,
-         lang = NULL, zoom_levels,
-         schemas = jsonlite::toJSON(
-           list(var_left = list(time = time), var_right = list(time = time)))) {
+function(var_left, var_right = " ", scale, region, time, select_id = paste0("\"NA\""),
+         lang = NULL, zoom_levels) {
   time <- jsonlite::fromJSON(time)
-  schemas <- jsonlite::fromJSON(schemas)
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
-  select_id <- as.character(select_id)
+  select_id <- jsonlite::fromJSON(select_id)
+  if (is.na(select_id) | select_id == "NA") select_id <- NA
+  schemas <-  list(var_left = list(time = time), var_right = list(time = time))
 
   tryCatch({
     cc.Rapi::api_context(var_left = var_left, var_right = var_right, scale = scale,
