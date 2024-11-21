@@ -4,7 +4,14 @@
 \alias{data_append_breaks}
 \title{Append new columns based on quantile breaks}
 \usage{
-data_append_breaks(var, data, q3_q5 = "q5", rename_col = "var_left", variables)
+data_append_breaks(
+  var,
+  data,
+  q3_q5 = "q5",
+  rename_col = "var_left",
+  variables,
+  breaks
+)
 }
 \arguments{
 \item{var}{<\code{character}> var_code field, which will be renamed using \code{rename_col}.}
@@ -19,6 +26,8 @@ Default is "q5".}
 
 \item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
 both var_left and var_right, and any potential parent variable aswell.}
+
+\item{breaks}{<\code{vector}>}
 }
 \value{
 <\code{data.frame}> Modified data frame with additional columns.

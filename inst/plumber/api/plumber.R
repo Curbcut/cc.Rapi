@@ -39,9 +39,12 @@ cors <- function(req, res) {
 #* @param region etc
 #* @param time etc
 #* @param select_id etc
+#* @param breaks etc
 #* @get /context
 function(var_left, var_right = " ", scale, region, time, select_id = paste0("\"NA\""),
-         lang = NULL, zoom_levels) {
+         lang = NULL, zoom_levels, breaks) {
+
+  breaks <- jsonlite::fromJSON(breaks)
   time <- jsonlite::fromJSON(time)
   zoom_levels <- jsonlite::fromJSON(zoom_levels)
   select_id <- jsonlite::fromJSON(select_id)
@@ -50,8 +53,9 @@ function(var_left, var_right = " ", scale, region, time, select_id = paste0("\"N
 
   tryCatch({
     cc.Rapi::api_context(var_left = var_left, var_right = var_right, scale = scale,
-                     region = region, time = time, select_id = select_id,
-                     zoom_levels = zoom_levels, lang = lang, schemas = schemas)
+                         region = region, time = time, select_id = select_id,
+                         zoom_levels = zoom_levels, lang = lang, schemas = schemas,
+                         breaks = breaks)
   }, error = function(e) {
     # Handle individual query error
     list(error = paste("500 - Internal server error:", e$message))

@@ -17,14 +17,15 @@ data_get(vars, scale, region, variables, ...)
   scale,
   region = NULL,
   variables,
+  breaks = NULL,
   vl_vr = "var_left",
   reduce = TRUE,
   ...
 )
 
-\method{data_get}{bivar}(vars, scale, region, variables, schemas, reduce = TRUE, ...)
+\method{data_get}{bivar}(vars, scale, region, variables, breaks, schemas, reduce = TRUE, ...)
 
-\method{data_get}{delta}(vars, scale, region, variables, reduce = TRUE, time, ...)
+\method{data_get}{delta}(vars, scale, region, variables, breaks, reduce = TRUE, time, ...)
 
 \method{data_get}{delta_bivar}(vars, scale, region, variables, time, ...)
 
@@ -45,6 +46,8 @@ used to determine how to grab de data and output it.}
 both var_left and var_right, and any potential parent variable aswell.}
 
 \item{...}{Additional arguments passed to methods.}
+
+\item{breaks}{<\code{vector}>}
 
 \item{vl_vr}{<\code{character}> Is the parent data coming from the var_left
 or var_right? How should it be renamed.}

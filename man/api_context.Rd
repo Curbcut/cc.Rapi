@@ -13,7 +13,8 @@ api_context(
   select_id,
   lang = NULL,
   zoom_levels,
-  schemas = list(var_left = list(time = time), var_right = list(time = time))
+  schemas = list(var_left = list(time = time), var_right = list(time = time)),
+  breaks
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ api_context(
 \item{zoom_levels}{<\verb{character vector}>}
 
 \item{schemas}{<\code{list}>}
+
+\item{breaks}{<\code{list}>}
 }
 \value{
 A list containing three components.

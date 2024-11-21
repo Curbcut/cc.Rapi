@@ -90,6 +90,7 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param breaks <`vector`>
 #' @param region <`character`> String of the region under study.
 #' @param vl_vr <`character`> Which of var_left or var_right is this delta supposed
 #' to be for. Defaults to var_left.
@@ -100,8 +101,8 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
 #' `ID` is the ID column from the original data, `var_1` and `var_2` are the
 #' values of the two variables being compared, and `var` is the percentage
 #' change between the two variables.
-data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_left",
-                           reduce = TRUE) {
+data_get_delta <- function(vars, time, scale, variables, breaks, region,
+                           vl_vr = "var_left", reduce = TRUE) {
   # Grab the correct var/time
   var <- vars[[vl_vr]]
   time_col <- time[[vl_vr]]
@@ -129,7 +130,8 @@ data_get_delta <- function(vars, time, scale, variables, region, vl_vr = "var_le
       data = data,
       q3_q5 = "q5",
       rename_col = vl_vr,
-      variables = variables
+      variables = variables,
+      breaks = NULL
     )
     data <- data$data
 
@@ -194,10 +196,11 @@ data_get <- function(vars, scale, region, variables, ...) {
 }
 
 #' @describeIn data_get The method for q5.
+#' @param breaks <`vector`>
 #' @param vl_vr <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
 #' @export
-data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left",
+data_get.q5 <- function(vars, scale, region = NULL, variables, breaks = NULL, vl_vr = "var_left",
                         reduce = TRUE, ...) {
   # Get data
   data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region)
@@ -207,13 +210,14 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
   data <- split(data, data$scale)
 
   # Append breaks
-  data <- lapply(data, \(data) {
+  data <- lapply(data, \(dat) {
     data_append_breaks(
       var = vars$var_left,
-      data = data,
+      data = dat,
       q3_q5 = "q5",
       rename_col = vl_vr,
-      variables = variables
+      variables = variables,
+      breaks = breaks$breaksMainVar$break_value
     )
   })
 
@@ -228,10 +232,11 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, vl_vr = "var_left
 }
 
 #' @describeIn data_get The method for bivar.
+#' @param breaks <`vector`>
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
-data_get.bivar <- function(vars, scale, region, variables, schemas,
+data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
                            reduce = TRUE, ...) {
   # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale, variables = variables)) {
@@ -257,15 +262,17 @@ data_get.bivar <- function(vars, scale, region, variables, schemas,
 
     # Append breaks
     all_data <- mapply(
-      \(var, d, rename_col) {
+      \(var, d, rename_col, brks) {
         data_append_breaks(
           var = var, data = d, q3_q5 = "q3",
           rename_col = rename_col,
-          variables = variables
+          variables = variables,
+          breaks = brks$break_value
         )
       }, c(vars$var_left, vars$var_right),
       data,
       c("var_left", "var_right"),
+      list(breaks$breaksMainVar, breaks$breaksCompareVar),
       SIMPLIFY = FALSE
     )
 
@@ -360,14 +367,15 @@ data_get.bivar <- function(vars, scale, region, variables, schemas,
 }
 
 #' @describeIn data_get The method for delta.
+#' @param breaks <`vector`>
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @export
-data_get.delta <- function(vars, scale, region, variables,
+data_get.delta <- function(vars, scale, region, variables, breaks,
                            reduce = TRUE, time, ...) {
   data_get_delta_fun(
     vars = vars, scale = scale, region = region, variables = variables,
-    reduce = reduce, time = time, ...
+    breaks = breaks, reduce = reduce, time = time, ...
   )
 }
 
@@ -382,6 +390,7 @@ data_get.delta <- function(vars, scale, region, variables,
 #' @param region <`character vector`> String of the region under study
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param breaks <`vector`>
 #' @param reduce <`logical`> Should the dataframe be reduced to a single table
 #' (if there are multiple scales)
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
@@ -389,20 +398,20 @@ data_get.delta <- function(vars, scale, region, variables,
 #' @param ... Additional arguments passed to methods.
 #'
 #' @seealso \code{\link{data_get.delta}}
-data_get_delta_fun <- function(vars, scale, region, variables,
+data_get_delta_fun <- function(vars, scale, region, variables, breaks,
                                reduce = TRUE, time, ...) {
   UseMethod("data_get_delta_fun", vars)
 }
 
 #' @describeIn data_get_delta_fun The method for scalar variables.
-data_get_delta_fun.scalar <- function(vars, scale, region, variables, time,
+data_get_delta_fun.scalar <- function(vars, scale, region, variables, breaks, time,
                                       reduce = TRUE, ...) {
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
     scale = scale, variables = variables, region = region,
-    reduce = reduce
+    reduce = reduce, breaks = breaks
   )
 
   process_data <- \(data) {
@@ -414,7 +423,8 @@ data_get_delta_fun.scalar <- function(vars, scale, region, variables, time,
     class(data) <- c(current, class(data))
 
     # Grab the breaks in the data
-    breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
+    breaks <- breaks$breaksMainVar$break_value
+      # breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
 
     # Add the breaks attribute
     attr(data, "breaks_var_left") <- breaks
@@ -444,13 +454,13 @@ data_get_delta_fun.scalar <- function(vars, scale, region, variables, time,
 }
 
 #' @describeIn data_get_delta_fun The method for ordinal variables.
-data_get_delta_fun.ordinal <- function(vars, scale, region, variables,
+data_get_delta_fun.ordinal <- function(vars, scale, region, variables, breaks,
                                        reduce = TRUE, time, ...) {
 
   # Get data
   data <- data_get_delta(
     vars = vars, time = time,
-    scale = scale, variables = variables, region = region,
+    scale = scale, variables = variables, breaks = breaks, region = region,
     reduce = reduce
   )
 
@@ -463,7 +473,8 @@ data_get_delta_fun.ordinal <- function(vars, scale, region, variables,
     class(data) <- c(current, class(data))
 
     # Grab the breaks in the data
-    breaks <- breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
+    breaks <- breaks
+    # breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
 
     # Add the breaks attribute
     attr(data, "breaks_var_left") <- breaks

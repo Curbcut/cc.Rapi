@@ -1,8 +1,12 @@
-# var_left <- c("alp")
-# var_right = " "
+# var_left <- c("housing_tenant")
+# breaks <- list(breaksMainVar = data.frame(break_value = c(1, 1.4, 1.8, 2.2, 2.6, 3)))
+# breaks <- list(breaksMainVar = data.frame(break_value = c(-0.09, -0.04, -0.02, 0.02, 0.04, 0.09)))
+# breaks <- list(breaksMainVar = data.frame(break_value = c(1,1.9,2.3,3)),
+#                breaksCompareVar = data.frame(break_value = c(0,0.2,0.3,0.7)))
+# var_right = "housing_tenant"
 # scale <- "CT"
 # region <- "CMA"
-# time <- c(2011, 2021)
+# time <- c(2011,2021)
 # select_id <- NA
 # schema <- "mtl"
 # lang <- NULL
@@ -28,13 +32,14 @@
 #' @param lang <`character vector`>
 #' @param zoom_levels <`character vector`>
 #' @param schemas <`list`>
+#' @param breaks <`list`>
 #'
 #' @return A list containing three components.
 #' @export
 api_context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
                     lang = NULL, zoom_levels,
                     schemas = list(var_left = list(time = time),
-                                   var_right = list(time = time))) {
+                                   var_right = list(time = time)), breaks) {
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -84,7 +89,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   # Timing data_get
   data_get_start <- Sys.time()
   data <- data_get(vars, scale, region, variables = variables, time = time_formatted,
-                   schemas = schemas)
+                   schemas = schemas, breaks = breaks)
   data_get_end <- Sys.time()
 
   # Timing legend_render

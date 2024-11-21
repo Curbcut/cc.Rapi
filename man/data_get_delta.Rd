@@ -9,6 +9,7 @@ data_get_delta(
   time,
   scale,
   variables,
+  breaks,
   region,
   vl_vr = "var_left",
   reduce = TRUE
@@ -25,6 +26,8 @@ data, corresponding to a path on disk, e.g. \code{DA} or \code{CSD}.}
 
 \item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
 both var_left and var_right, and any potential parent variable aswell.}
+
+\item{breaks}{<\code{vector}>}
 
 \item{region}{<\code{character}> String of the region under study.}
 

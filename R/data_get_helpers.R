@@ -326,10 +326,11 @@ use_quantiles <- function(data_vec) {
 #' "var_left". Can also be "var_right".
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param breaks <`vector`>
 #'
 #' @return <`data.frame`> Modified data frame with additional columns.
 data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
-                               variables) {
+                               variables, breaks) {
   # Keep track of previous attributes
   prev_attr <- attributes(data)
   prev_attr <- prev_attr[!names(prev_attr) %in% c(
@@ -351,41 +352,45 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   # Take the opportunity to also add schema to the data
   prev_attr$schema <- variables$schema[variables$var_code == var][[1]]
 
-  # Calculate break
-  quintiles <- use_quantiles(data_vec)
-
-  # Are breaks hardcoded in the variables table? Output that.
-  brks <- variables$breaks_q5[variables$var_code == var][[1]]
-
-  breaks <-   # Determine the appropriate break points based on given conditions
-  if (q3_q5 == "q3") {
-    # If q3_q5 is q3, always find breaks for quintiles
-    find_breaks_quintiles(dist = data_vec, q3_q5 = q3_q5)
-  } else {
-    # For cases when q3_q5 is not q3
-    if (!is.null(brks) & length(brks) > 0) {
-      # Use brks if it's not NULL
-      brks
-    } else if (quintiles) {
-      # Find breaks for quintiles if quintiles is TRUE
-      find_breaks_quintiles(dist = data_vec, q3_q5 = q3_q5)
-    } else {
-      # Default case: find breaks based on q5 method
-      find_breaks_q5(min_val = min(data_vec), max_val = max(data_vec))
-    }
-  }
+  # # Calculate break
+  # quintiles <- use_quantiles(data_vec)
+  #
+  # # Are breaks hardcoded in the variables table? Output that.
+  # brks <- variables$breaks_q5[variables$var_code == var][[1]]
+  #
+  # breaks <-   # Determine the appropriate break points based on given conditions
+  # if (q3_q5 == "q3") {
+  #   # If q3_q5 is q3, always find breaks for quintiles
+  #   find_breaks_quintiles(dist = data_vec, q3_q5 = q3_q5)
+  # } else {
+  #   # For cases when q3_q5 is not q3
+  #   if (!is.null(brks) & length(brks) > 0) {
+  #     # Use brks if it's not NULL
+  #     brks
+  #   } else if (quintiles) {
+  #     # Find breaks for quintiles if quintiles is TRUE
+  #     find_breaks_quintiles(dist = data_vec, q3_q5 = q3_q5)
+  #   } else {
+  #     # Default case: find breaks based on q5 method
+  #     find_breaks_q5(min_val = min(data_vec), max_val = max(data_vec))
+  #   }
+  # }
 
   # Rework breaks just for assembling (we want to include ALL observations)
-  assemble_breaks <- breaks
-  assemble_breaks[1] <- -Inf
-  assemble_breaks[length(assemble_breaks)] <- Inf
+  if (!is.null(breaks)) {
 
-  # Assemble output
-  out <- as.data.frame(lapply(data_val, .bincode, assemble_breaks, include.lowest = TRUE))
-  out <- stats::setNames(out, sprintf("%s_%s", names(data_val), q3_q5))
-  data <- cbind(data, out) # bind the data
-  data <- data.frame(data)
-  attr(data, sprintf("breaks_%s", rename_col)) <- breaks
+    assemble_breaks <- breaks
+    assemble_breaks[1] <- -Inf
+    assemble_breaks[length(assemble_breaks)] <- Inf
+
+    # Assemble output
+    out <- as.data.frame(lapply(data_val, .bincode, assemble_breaks, include.lowest = TRUE))
+    out <- stats::setNames(out, sprintf("%s_%s", names(data_val), q3_q5))
+    data <- cbind(data, out) # bind the data
+    data <- data.frame(data)
+    attr(data, sprintf("breaks_%s", rename_col)) <- breaks
+
+  }
 
   # Rename attributes so it's clearly assigned on var_left or var_right
   names(prev_attr) <- sprintf("%s_%s", names(prev_attr), rename_col)
