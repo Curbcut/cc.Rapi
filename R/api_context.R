@@ -1,12 +1,12 @@
-# var_left <- c("housing_tenant")
+# var_left <- c("alp")
 # breaks <- list(breaksMainVar = data.frame(break_value = c(1, 1.4, 1.8, 2.2, 2.6, 3)))
-# breaks <- list(breaksMainVar = data.frame(break_value = c(-0.09, -0.04, -0.02, 0.02, 0.04, 0.09)))
-# breaks <- list(breaksMainVar = data.frame(break_value = c(1,1.9,2.3,3)),
-#                breaksCompareVar = data.frame(break_value = c(0,0.2,0.3,0.7)))
-# var_right = "housing_tenant"
+# # breaks <- list(breaksMainVar = data.frame(break_value = c(-0.09, -0.04, -0.02, 0.02, 0.04, 0.09)))
+# # breaks <- list(breaksMainVar = data.frame(break_value = c(1,1.9,2.3,3)),
+# #                breaksCompareVar = data.frame(break_value = c(0,0.2,0.3,0.7)))
+# var_right = " "
 # scale <- "CT"
 # region <- "CMA"
-# time <- c(2011,2021)
+# time <- c(2021)
 # select_id <- NA
 # schema <- "mtl"
 # lang <- NULL

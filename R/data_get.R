@@ -217,7 +217,7 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, breaks = NULL, vl
       q3_q5 = "q5",
       rename_col = vl_vr,
       variables = variables,
-      breaks = breaks$breaksMainVar$break_value
+      breaks = breaks$breaksMainVar
     )
   })
 
@@ -267,7 +267,7 @@ data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
           var = var, data = d, q3_q5 = "q3",
           rename_col = rename_col,
           variables = variables,
-          breaks = brks$break_value
+          breaks = brks
         )
       }, c(vars$var_left, vars$var_right),
       data,
@@ -423,7 +423,7 @@ data_get_delta_fun.scalar <- function(vars, scale, region, variables, breaks, ti
     class(data) <- c(current, class(data))
 
     # Grab the breaks in the data
-    breaks <- breaks$breaksMainVar$break_value
+    breaks <- breaks$breaksMainVar
       # breaks_delta(vars = vars, scale = scale, character = FALSE, data = data)
 
     # Add the breaks attribute
