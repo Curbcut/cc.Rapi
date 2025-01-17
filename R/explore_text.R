@@ -345,7 +345,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   # Scales
   scale_plur <- db_get(select = c("plur"),
                        from = "scales_dictionary", where = list(scale = scale),
-                       schema = "mtl")$plur |>
+                       schema = schema)$plur |>
     cc_t(lang = lang)
 
   # Correlation
