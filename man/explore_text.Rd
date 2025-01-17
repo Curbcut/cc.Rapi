@@ -19,6 +19,7 @@ explore_text(
   top_scale,
   variables,
   lang = NULL,
+  schema,
   ...
 )
 
@@ -33,6 +34,7 @@ explore_text(
   top_scale,
   variables,
   lang = NULL,
+  schema,
   shown_scale = NULL,
   val = NULL,
   ...
@@ -49,6 +51,7 @@ explore_text(
   top_scale,
   variables,
   lang = NULL,
+  schema,
   ...
 )
 
@@ -63,6 +66,7 @@ explore_text(
   top_scale,
   variables,
   lang = NULL,
+  schema,
   shown_scale = NULL,
   val = NULL,
   ...
@@ -79,6 +83,7 @@ explore_text(
   top_scale,
   variables,
   lang = NULL,
+  schema,
   ...
 )
 }

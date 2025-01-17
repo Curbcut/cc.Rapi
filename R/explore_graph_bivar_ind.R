@@ -77,8 +77,8 @@ explore_graph_bivar_ind.ordinal <- function(vars, select_id, scale, data, time, 
     time = time,
     schemas = schemas
   )
-  vr_breaks <- attr(data, "breaks_var_right")
-  vl_breaks <- attr(data, "breaks_var_left")
+  vr_breaks <- attr(data, "breaks_var_right") |> unlist()
+  vl_breaks <- attr(data, "breaks_var_left") |> unlist()
 
   # Get the scales ggplot function
   x_scale <- explore_graph_scale(
@@ -87,7 +87,7 @@ explore_graph_bivar_ind.ordinal <- function(vars, select_id, scale, data, time, 
     data_vals = data[[vl_col]],
     scale = shared_info$treated_scale,
     lang = lang,
-    breaks = attr(data, "breaks_var_left"),
+    breaks = vl_breaks,
     biv = TRUE
   )
   y_scale <- explore_graph_scale(

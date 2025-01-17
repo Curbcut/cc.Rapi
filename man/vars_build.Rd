@@ -5,7 +5,7 @@
 \title{Determine the data type (class) of different \code{var_left}, \code{var_right} and \code{df}
 combinations}
 \usage{
-vars_build(var_left, var_right = " ", scale, time, variables)
+vars_build(var_left, var_right = " ", scale, time, variables, schema)
 }
 \arguments{
 \item{var_left}{<\verb{reactive character}> Character string of the selected

@@ -11,7 +11,8 @@ explore_context(
   switch_DA,
   top_scale,
   shown_scale = NULL,
-  lang = NULL
+  lang = NULL,
+  schema
 )
 }
 \arguments{

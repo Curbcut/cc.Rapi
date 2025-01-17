@@ -19,6 +19,7 @@ explore_text_select_val(var, variables, ...)
   time,
   schemas = NULL,
   region,
+  schema,
   ...
 )
 

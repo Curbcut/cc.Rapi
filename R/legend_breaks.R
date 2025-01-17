@@ -21,7 +21,7 @@ legend_breaks.q5 <- function(vars, data, ...) {
   # Get pretty breaks
   pretty_breaks <- convert_unit(
     var = vars$var_left,
-    x = attr(data, "breaks_var_left"),
+    x = attr(data, "breaks_var_left") |> unlist(),
     compact = TRUE
   )
 
@@ -129,12 +129,12 @@ legend_breaks.bivar_ldelta_rq3 <- function(vars, data, time, ...) {
 legend_breaks.bivar <- function(vars, data, ...) {
   break_labs_y <- convert_unit(
     var = vars$var_left,
-    x = attr(data, "breaks_var_left"),
+    x = attr(data, "breaks_var_left") |> unlist(),
     compact = TRUE
   )
   break_labs_x <- convert_unit(
     var = vars$var_right,
-    x = attr(data, "breaks_var_right"),
+    x = attr(data, "breaks_var_right") |> unlist(),
     compact = TRUE
   )
   return(list(x = break_labs_x, y = break_labs_y))

@@ -4,14 +4,14 @@
 # # breaks <- list(breaksMainVar = data.frame(break_value = c(1,1.9,2.3,3)),
 # #                breaksCompareVar = data.frame(break_value = c(0,0.2,0.3,0.7)))
 # var_right = " "
-# scale <- "CT"
-# region <- "CMA"
+# scale <- "csd"
+# region <- "01"
 # time <- c(2021)
 # select_id <- NA
-# schema <- "mtl"
+# schema <- "public"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))
-# zoom_levels <- c("boroughCSD", "CT", "DA")
+# zoom_levels <- c("pr", "csd", "da", "db")
 # db_pool <- db_connection()
 # font_family <-  "acidgrotesk-book"
 
@@ -39,7 +39,7 @@
 api_context <- function(var_left, var_right = " ", scale, region = NULL, time, select_id,
                     lang = NULL, zoom_levels,
                     schemas = list(var_left = list(time = time),
-                                   var_right = list(time = time)), breaks) {
+                                   var_right = list(time = time)), breaks, schema) {
   start_time <- Sys.time()
 
   var_vec <- var_left
@@ -48,10 +48,10 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
 
   # Timing db_get_helper
   db_get_start <- Sys.time()
-  variables <- db_get_helper(sprintf("SELECT * FROM mtl.variables
+  variables <- db_get_helper(sprintf("SELECT * FROM %s.variables
         WHERE var_code IN (%s)
         UNION
-        SELECT * FROM mtl.variables
+        SELECT * FROM %s.variables
         WHERE var_code IN (
             SELECT
                 CASE
@@ -59,9 +59,9 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
                     WHEN parent_vec = 'population' THEN 'c_population'
                     ELSE parent_vec
                 END
-            FROM mtl.variables
+            FROM %s.variables
             WHERE var_code IN (%s)
-        )", var_vec, var_vec))
+        )", schema, var_vec, schema, schema, var_vec))
   db_get_end <- Sys.time()
 
   # Update the var_right schema if it's needed.
@@ -80,7 +80,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
 
   # Timing vars_build
   vars_build_start <- Sys.time()
-  vars <- vars_build(var_left, var_right, scale, time, variables = variables)
+  vars <- vars_build(var_left, var_right, scale, time, variables)
   vars_build_end <- Sys.time()
 
   time_formatted <- vars$time
@@ -89,7 +89,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   # Timing data_get
   data_get_start <- Sys.time()
   data <- data_get(vars, scale, region, variables = variables, time = time_formatted,
-                   schemas = schemas, breaks = breaks)
+                   schemas = schemas, breaks = breaks, schema = schema)
   data_get_end <- Sys.time()
 
   # Timing legend_render
@@ -108,7 +108,7 @@ api_context <- function(var_left, var_right = " ", scale, region = NULL, time, s
   explore_text_start <- Sys.time()
   text <- explore_text(vars = vars, select_id = select_id, scale = scale, region = region,
                        data = data, time = time_formatted, schemas = schemas, lang = lang,
-                       top_scale = zoom_levels[[1]], variables = variables)
+                       top_scale = zoom_levels[[1]], variables = variables, schema = schema)
   explore_text_end <- Sys.time()
 
   # # Map colors

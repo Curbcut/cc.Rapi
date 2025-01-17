@@ -24,14 +24,15 @@
 #' @param lang <`character`> Active language. "en" or "fr". Defaults to NULL
 #' for no translation.
 #'
+#'
 #' @return A list containing multiple texts used for the explore text panel.
 #' @export
 explore_context <- function(region, select_id, scale, switch_DA, top_scale,
-                            shown_scale = NULL, lang = NULL) {
+                            shown_scale = NULL, lang = NULL, schema) {
   # Grab the region dictionary
   region_df <- db_get(select = c("to_compare", "to_compare_determ", "to_compare_short"),
                       from = "regions_dictionary", where = list(region = region),
-                      schema = "mtl")
+                      schema = schema)
 
   # Prepare a return when there is no selection
   region_only_return <- \(region_df) {
@@ -51,12 +52,12 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
   scale_grab_chr_for <- if (!is.null(shown_scale)) shown_scale else scale
   scale_df <-  db_get(select = c("place_heading", "place_name", "plur"),
                       from = "scales_dictionary", where = list(scale = scale_grab_chr_for),
-                      schema = "mtl")
+                      schema = schema)
 
   # Get the place heading and glue it
   dat <- db_get(select = c("name", "name_2"),
                 from = scale_grab_chr_for, where = list(ID = select_id),
-                schema = "mtl")
+                schema = schema)
 
   # the selection is not found in the database
   if (nrow(dat) == 0) return(region_only_return(region_df))
@@ -64,7 +65,7 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
   name <- dat$name
   name_2 <- dat$name_2
   if (is.na(name_2)) {
-    name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "ID"::text = (
+    name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "id"::text = (
               SELECT replace(
                          CASE
                              WHEN jsonb_typeof("%s_ID") = \'array\' THEN
@@ -73,8 +74,8 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
                                  ("%s_ID"::text)
                          END, \'"\', \'\')
               FROM %s."%s"
-              WHERE "ID"::text = \'%s\')',
-              "mtl", top_scale, top_scale, top_scale, top_scale, "mtl", scale, select_id)
+              WHERE "id"::text = \'%s\')',
+              schema, top_scale, top_scale, top_scale, top_scale, schema, scale, select_id)
     )$name
   }
   name_2 <- cc_t(name_2, lang = lang)
@@ -163,13 +164,13 @@ explore_text_parent_title <- function(var, variables, lang = NULL) {
 #' selection.
 explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
                                        scale, data, lang = NULL, time, schemas = NULL,
-                                       variables, ...) {
+                                       variables, schema, ...) {
   if (is.na(select_id)) {
     # Grab the region values dataframe
     region_values <- region_value(
       var = var, data = data, time = time, col = col,
       scale = scale, region = region, schemas = schemas,
-      variables = variables
+      variables = variables, schema = schema
     )
 
     # Return the values
@@ -209,10 +210,11 @@ explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
 #' directory containing the QS files. Default is "data/".
 #' @param region <`character`> Character string specifying the name of the region.
 #' Usually equivalent of `r$region()`.
+#' @param schema <`character`>
 #'
 #' @return A vector containing the parent value for the zone.
 explore_get_parent_data <- function(var, variables, select_id, scale, col = "var_left",
-                                    time_col, region) {
+                                    time_col, region, schema = schema) {
   # Get the parent string
   parent_string <- var_get_info(var = var, variables = variables, what = "parent_vec")
 
@@ -220,7 +222,7 @@ explore_get_parent_data <- function(var, variables, select_id, scale, col = "var
                      time = time_col)$vars
   parent_data <- data_get(
     vars = vars, scale = scale, region = region, vr_vl = col,
-    variables = variables
+    variables = variables, schema = schema
   )
 
   rcol <- sprintf("%s_%s", col, time_col)
@@ -264,7 +266,7 @@ explore_text_select_val <- function(var, variables, ...) {
 #' @param region <`character`> String of the region under study
 #' @export
 explore_text_select_val.pct <- function(var, variables, select_id, data, scale, col = "var_left",
-                                        time, schemas = NULL, region, ...) {
+                                        time, schemas = NULL, region, schema, ...) {
   # Create empty vector
   out <- c()
 
@@ -281,7 +283,7 @@ explore_text_select_val.pct <- function(var, variables, select_id, data, scale, 
   # Get the parent data
   all_count <- explore_get_parent_data(
     var = var, variables = variables, select_id = select_id,
-    scale = scale, time_col = time[[col]], region = region
+    scale = scale, time_col = time[[col]], region = region, schema = schema
   )
 
   # Multiply the percentage by the count of parent in the zone
@@ -354,7 +356,7 @@ explore_text_select_val_ind.scalar <- function(var, variables, data, select_id, 
     # Get the group in which falls the selection
     rank <- data[[brk_col]][data$ID == select_id]
   } else {
-    findInterval(val, attr(data, "breaks_var_left"))
+    findInterval(val, attr(data, "breaks_var_left") |> unlist())
   }
 
   # Grab the rank name for the rank

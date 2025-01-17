@@ -30,8 +30,7 @@
 #' @export
 explore_text <- function(vars, region, select_id, scale, time, data,
                          schemas, top_scale,
-                         variables,
-                         lang = NULL, ...) {
+                         variables, lang = NULL, schema, ...) {
   UseMethod("explore_text", vars)
 }
 
@@ -53,7 +52,7 @@ explore_text <- function(vars, region, select_id, scale, time, data,
 explore_text.q5 <- function(vars, region, select_id, scale, time, data,
                             schemas, top_scale,
                             variables,
-                            lang = NULL, shown_scale = NULL, val = NULL, ...) {
+                            lang = NULL, schema, shown_scale = NULL, val = NULL, ...) {
 
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
@@ -64,7 +63,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    shown_scale = shown_scale, top_scale = top_scale, lang = lang
+    shown_scale = shown_scale, top_scale = top_scale, lang = lang, schema = schema
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -88,7 +87,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
     select_id = select_id, data = data,
     scale = scale, lang = lang,
     time = time, schemas = schemas, val = val,
-    variables = variables
+    variables = variables, schema = schema
   )
 
   # Put it all together
@@ -155,7 +154,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.bivar <- function(vars, region, select_id, scale, time, data,
                                schemas, top_scale,
-                               variables, lang = NULL, ...) {
+                               variables, lang = NULL, schema, ...) {
   # Append date function helper
   append_date <- \(out) {
     date_1 <- time$var_left
@@ -193,7 +192,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    top_scale = top_scale, lang = lang
+    top_scale = top_scale, lang = lang, schema = schema
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -219,7 +218,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
       select_id = select_id, data = data, time = time,
       scale = scale, lang = lang,
       col = "var_left", schemas = schemas,
-      variables = variables
+      variables = variables, schema = schema
     )
 
     # Grab the value string
@@ -228,7 +227,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
       select_id = select_id, data = data,
       scale = scale, time = time,
       col = "var_right", lang = lang, schemas = schemas,
-      variables = variables
+      variables = variables, schema = schema
     )
 
     # Add the coloring
@@ -454,8 +453,8 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.delta <- function(vars, region, select_id, scale, time, data,
                                schemas, top_scale,
-                               variables,
-                               lang = NULL, shown_scale = NULL, val = NULL, ...) {
+                               variables, lang = NULL, schema, shown_scale = NULL,
+                               val = NULL, ...) {
 
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
@@ -466,7 +465,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale, shown_scale = shown_scale,
-    top_scale = top_scale, lang = lang
+    top_scale = top_scale, lang = lang, schema = schema
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and
@@ -594,8 +593,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
 #' @export
 explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
                                      schemas, top_scale,
-                                     variables,
-                                     lang = NULL, ...) {
+                                     variables, lang = NULL, schema, ...) {
 
   # Adjust the selected ID in the case where the selection is not in `data`
   if (!select_id %in% data$ID) select_id <- NA
@@ -603,7 +601,7 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
   # Grab the shared info
   context <- explore_context(
     region = region, select_id = select_id, scale = scale,
-    top_scale = top_scale, lang = lang
+    top_scale = top_scale, lang = lang, schema = schema
   )
 
   # The context might have used a scale in the `scales_as_DA` argument, and

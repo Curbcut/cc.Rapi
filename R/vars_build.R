@@ -15,7 +15,7 @@
 #' a class attached.
 #'
 #' @export
-vars_build <- function(var_left, var_right = " ", scale, time, variables) {
+vars_build <- function(var_left, var_right = " ", scale, time, variables, schema) {
 
   # Is everything valid? Return NULL if it's invalid.
   if (var_right != " ") {

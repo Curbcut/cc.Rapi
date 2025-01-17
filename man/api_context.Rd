@@ -14,7 +14,8 @@ api_context(
   lang = NULL,
   zoom_levels,
   schemas = list(var_left = list(time = time), var_right = list(time = time)),
-  breaks
+  breaks,
+  schema
 )
 }
 \arguments{

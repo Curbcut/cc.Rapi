@@ -4,13 +4,15 @@
 \alias{db_get_data_from_sql}
 \title{Retrieve data from a QS file based on variable and scale}
 \usage{
-db_get_data_from_sql(vars_vector, scales, region)
+db_get_data_from_sql(vars_vector, scales, region, schema)
 }
 \arguments{
 \item{vars_vector}{<\code{character}> A string specifying the name of the table to
 retrieve data from. Single variable = single table. e.g. \code{housing_tenant}}
 
 \item{region}{<\code{character}> String of the region under study.}
+
+\item{schema}{<\code{public}>}
 
 \item{scale}{<\code{character}> A string specifying the scale at which to retrieve
 data, corresponding to a path on disk, e.g. \code{DA} or \code{CSD}.}

@@ -10,28 +10,49 @@
 \alias{data_get.default}
 \title{Get data}
 \usage{
-data_get(vars, scale, region, variables, ...)
+data_get(vars, scale, region, variables, schema, ...)
 
 \method{data_get}{q5}(
   vars,
   scale,
   region = NULL,
   variables,
+  schema,
   breaks = NULL,
   vl_vr = "var_left",
   reduce = TRUE,
   ...
 )
 
-\method{data_get}{bivar}(vars, scale, region, variables, breaks, schemas, reduce = TRUE, ...)
+\method{data_get}{bivar}(
+  vars,
+  scale,
+  region,
+  variables,
+  schema,
+  breaks,
+  schemas,
+  reduce = TRUE,
+  ...
+)
 
-\method{data_get}{delta}(vars, scale, region, variables, breaks, reduce = TRUE, time, ...)
+\method{data_get}{delta}(
+  vars,
+  scale,
+  region,
+  variables,
+  schema,
+  breaks,
+  reduce = TRUE,
+  time,
+  ...
+)
 
-\method{data_get}{delta_bivar}(vars, scale, region, variables, time, ...)
+\method{data_get}{delta_bivar}(vars, scale, region, variables, schema, time, ...)
 
-\method{data_get}{bivar_ldelta_rq3}(vars, scale, region, variables, time, ...)
+\method{data_get}{bivar_ldelta_rq3}(vars, scale, region, variables, schema, time, ...)
 
-\method{data_get}{default}(vars, scale, region, variables, vr_vl, ...)
+\method{data_get}{default}(vars, scale, region, variables, schema, vr_vl, ...)
 }
 \arguments{
 \item{vars}{<\verb{named list}> Named list with a class. Object built using the
@@ -44,6 +65,8 @@ used to determine how to grab de data and output it.}
 
 \item{variables}{<\code{data.frame}> Dataframe of the variables dictionary, containing
 both var_left and var_right, and any potential parent variable aswell.}
+
+\item{schema}{<\code{character}>}
 
 \item{...}{Additional arguments passed to methods.}
 

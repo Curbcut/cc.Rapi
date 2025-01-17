@@ -12,7 +12,7 @@
 \alias{explore_text_values_q5.ppo}
 \title{Generate text for the given variables and region - q5 version}
 \usage{
-explore_text_values_q5(var, region, data, variables, ...)
+explore_text_values_q5(var, region, data, variables, schema, ...)
 
 \method{explore_text_values_q5}{pct}(
   var,
@@ -25,6 +25,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -39,6 +40,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -53,6 +55,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -67,6 +70,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -81,6 +85,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -95,6 +100,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 
@@ -123,6 +129,7 @@ explore_text_values_q5(var, region, data, variables, ...)
   lang,
   time,
   schemas = NULL,
+  schema,
   ...
 )
 }

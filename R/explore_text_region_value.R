@@ -22,12 +22,12 @@
 #' returns a list with elements like \code{val} and \code{count}.
 #' @export
 region_value <- function(var, data, time, scale, region, select_id, col, schemas = NULL,
-                         variables, ...) {
+                         variables, schema, ...) {
   # Get the parent variable data
   rv <- region_value_data_grab(
     var = var, data = data, time = time, col = col,
     scale = scale, region = region, schemas = schemas,
-    variables = variables
+    variables = variables, schema = schema
   )
 
   # Return the output of every method
@@ -100,7 +100,7 @@ region_value_method.ind <- function(var, data_vals, parent_vals, data, time, col
   brk_col <- sprintf("%s_q5", col)
 
   # Get the breaks
-  brks <- data[c("ID", brk_col)]
+  brks <- data[c("id", brk_col)]
   brks$parent_vals <- parent_vals
 
   # How many 'parent' in the two top brackets
@@ -166,7 +166,7 @@ region_value_method.default <- function(var, data_vals, parent_vals, ...) {
 #' which holds the parent data values.
 #' @export
 region_value_data_grab <- function(var, data, time, scale, region, col, schemas = NULL,
-                                   variables) {
+                                   variables, schema) {
   # Get the parent variable
   parent_string <- var_get_info(var, variables = variables, what = "parent_vec")
   if (parent_string == "population") parent_string <- "c_population"
@@ -180,7 +180,7 @@ region_value_data_grab <- function(var, data, time, scale, region, col, schemas 
                        time = time$var_left)$vars
     parent_data <- data_get(
       vars = vars, scale = scale, region = region, vr_vl = col,
-      variables = variables
+      variables = variables, schema = schema
     )
     # In the case where there is just one value, no time. Like `area`.
     if (col %in% names(parent_data)) {

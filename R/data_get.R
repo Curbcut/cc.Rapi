@@ -9,16 +9,17 @@
 #' @param scale <`character`> A string specifying the scale at which to retrieve
 #' data, corresponding to a path on disk, e.g. `DA` or `CSD`.
 #' @param region <`character`> String of the region under study.
+#' @param schema <`public`>
 #'
 #' @return A data.frame object with the selected data from the specified table.
-db_get_data_from_sql <- function(vars_vector, scales, region) {
+db_get_data_from_sql <- function(vars_vector, scales, region, schema) {
 
   with_ids_as <- list()
   for (scale in scales) {
     with_ids_as[[scale]] <-
-      sprintf("SELECT jsonb_array_elements_text(\"scales\"->'%s')::text AS ID
+      sprintf("SELECT jsonb_array_elements_text(\"scales\"->'%s')::text AS id
   FROM \"%s\".regions_dictionary
-  WHERE \"region\" = '%s'", scale, "mtl", region)
+  WHERE \"region\" = '%s'", scale, schema, region)
   }
   with_ids_as <- paste0("WITH ids AS (", paste0(with_ids_as, collapse = " UNION "), ")")
 
@@ -30,7 +31,7 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
       var_selections[[scale]] <-
         sprintf("SELECT *, '%s' AS scale
   FROM %s.\"%s_%s\"
-  WHERE \"ID\" IN (SELECT ID FROM ids)", scale, "mtl", scale, var)
+  WHERE id IN (SELECT ID FROM ids)", scale, schema, scale, var)
     }
     all_vars[[var]] <- paste0(var, " AS (", paste0(var_selections, collapse = " UNION ALL "), ")")
 
@@ -45,7 +46,7 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
     for (i in 2:length(vars_vector)) {
       main_select <- paste(main_select, sprintf(", %s.*", vars_vector[[i]]), collapse = ", ")
       join_clauses <- paste(join_clauses, sprintf(
-        "LEFT JOIN %s ON %s.\"ID\" = %s.\"ID\" AND %s.scale = %s.scale ",
+        "LEFT JOIN %s ON %s.id = %s.id AND %s.scale = %s.scale ",
         vars_vector[[i]], vars_vector[[1]], vars_vector[[i]], vars_vector[[1]], vars_vector[[i]]
       ))
     }
@@ -59,11 +60,11 @@ db_get_data_from_sql <- function(vars_vector, scales, region) {
   result <- db_get_helper(final_call)
 
   # Remove ID... and scale...
-  if (sum(grepl("ID\\.\\.|scale\\.\\.", names(result))) > 0)
-    result <- result[-grep("ID\\.\\.|scale\\.\\.", names(result))]
+  if (sum(grepl("id\\.\\.|scale\\.\\.", names(result))) > 0)
+    result <- result[-grep("id\\.\\.|scale\\.\\.", names(result))]
 
   # Go over potentially expected duplicated columns
-  duplicate_ID <- grep("^ID$", names(result))
+  duplicate_ID <- grep("^id$", names(result))
   if (length(duplicate_ID) > 1)
     result <- result[-duplicate_ID[2:length(duplicate_ID)]]
   duplicate_scale <- grep("^scale$", names(result))
@@ -108,7 +109,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
   time_col <- time[[vl_vr]]
 
   # Retrieve
-  data <- db_get_data_from_sql(var = var, scale = scale, region = region)
+  data <- db_get_data_from_sql(var = var, scales = scale, region = region)
 
   # Calculate breaks for the right columns
   data_schema <- variables$schema[variables$var_code == var][[1]]
@@ -116,7 +117,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
 
   cols <- match_schema_to_col(data = data, time = time_col, col = var, schemas = NULL)
   breaks_var <- variables$breaks_var[variables$var_code == var]
-  keep_cols <- c("ID", "scale", cols, if (!is.na(breaks_var)) breaks_var) # keep the breaks_var and use it to calculate breaks
+  keep_cols <- c("id", "scale", cols, if (!is.na(breaks_var)) breaks_var) # keep the breaks_var and use it to calculate breaks
   data <- data[unique(keep_cols)]
 
   # So that it works as a single SQL call for breaks, we will iterate over
@@ -142,7 +143,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
     # Preserve attributes before subsetting
     attrs <- attributes(data)
     # Subset the data
-    data_subset <- data[c("ID", "scale", grep(paste0(cols, collapse = "|"), names(data), value = TRUE))]
+    data_subset <- data[c("id", "scale", grep(paste0(cols, collapse = "|"), names(data), value = TRUE))]
     # Restore the original attributes
     attributes(data_subset) <- attrs
 
@@ -183,6 +184,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
 #' @param region <`character vector`> Character of the region under study
 #' @param variables <`data.frame`> Dataframe of the variables dictionary, containing
 #' both var_left and var_right, and any potential parent variable aswell.
+#' @param schema <`character`>
 #' @param reduce <`logical`> Should the dataframe be reduced to a single table
 #' (if there are multiple scales)
 #' @param ... Additional arguments passed to methods.
@@ -191,7 +193,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
 #' with an ID column, one column per year of data, and one `group` column per
 #' year of data.
 #' @export
-data_get <- function(vars, scale, region, variables, ...) {
+data_get <- function(vars, scale, region, variables, schema, ...) {
   UseMethod("data_get", vars)
 }
 
@@ -200,10 +202,11 @@ data_get <- function(vars, scale, region, variables, ...) {
 #' @param vl_vr <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
 #' @export
-data_get.q5 <- function(vars, scale, region = NULL, variables, breaks = NULL, vl_vr = "var_left",
+data_get.q5 <- function(vars, scale, region = NULL, variables, schema,
+                        breaks = NULL, vl_vr = "var_left",
                         reduce = TRUE, ...) {
   # Get data
-  data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region)
+  data <- db_get_data_from_sql(vars$var_left, scale = scale, region = region, schema = schema)
 
   # So that it works as a single SQL call for breaks, we will iterate over
   # scales here.
@@ -217,7 +220,7 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, breaks = NULL, vl
       q3_q5 = "q5",
       rename_col = vl_vr,
       variables = variables,
-      breaks = breaks$breaksMainVar
+      breaks = if (!is.null(breaks)) breaks$breaksMainVar else NULL
     )
   })
 
@@ -236,7 +239,7 @@ data_get.q5 <- function(vars, scale, region = NULL, variables, breaks = NULL, vl
 #' @param schemas <`named list`> Current schema information. The additional widget
 #' values that have an impact on which data column to pick. Usually `r[[id]]$schema()`.
 #' @export
-data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
+data_get.bivar <- function(vars, scale, region, variables, schema, breaks, schemas,
                            reduce = TRUE, ...) {
   # If data isn't present, throw an empty tibble
   if (!is_data_present_in_scale(var = vars$var_right, scale = scale, variables = variables)) {
@@ -257,7 +260,7 @@ data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
       for (s in variables$schema[variables$var_code == v][[1]]) {
         this_var_name <- gsub(s, "", this_var_name)
       }
-      data[this_var_name %in% c("ID", "scale", v)]
+      data[this_var_name %in% c("id", "scale", v)]
     })
 
     # Append breaks
@@ -303,7 +306,7 @@ data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
 
     # Merge (remove scale from one first)
     all_data[[2]]$data <- all_data[[2]]$data[names(all_data[[2]]$data) != "scale"]
-    data <- merge(all_data[[1]]$data, all_data[[2]]$data, by = "ID", all = TRUE)
+    data <- merge(all_data[[1]]$data, all_data[[2]]$data, by = "id", all = TRUE)
 
     # Re-add breaks
     attr(data, "breaks_var_left") <- breaks_vl
@@ -371,7 +374,7 @@ data_get.bivar <- function(vars, scale, region, variables, breaks, schemas,
 #' @param time <`named list`> Object built using the \code{\link{vars_build}}
 #' function. It contains the time for both var_left and var_right variables.
 #' @export
-data_get.delta <- function(vars, scale, region, variables, breaks,
+data_get.delta <- function(vars, scale, region, variables, schema, breaks,
                            reduce = TRUE, time, ...) {
   data_get_delta_fun(
     vars = vars, scale = scale, region = region, variables = variables,
@@ -398,13 +401,13 @@ data_get.delta <- function(vars, scale, region, variables, breaks,
 #' @param ... Additional arguments passed to methods.
 #'
 #' @seealso \code{\link{data_get.delta}}
-data_get_delta_fun <- function(vars, scale, region, variables, breaks,
+data_get_delta_fun <- function(vars, scale, region, variables, schema, breaks,
                                reduce = TRUE, time, ...) {
   UseMethod("data_get_delta_fun", vars)
 }
 
 #' @describeIn data_get_delta_fun The method for scalar variables.
-data_get_delta_fun.scalar <- function(vars, scale, region, variables, breaks, time,
+data_get_delta_fun.scalar <- function(vars, scale, region, variables, schema, breaks, time,
                                       reduce = TRUE, ...) {
 
   # Get data
@@ -454,7 +457,7 @@ data_get_delta_fun.scalar <- function(vars, scale, region, variables, breaks, ti
 }
 
 #' @describeIn data_get_delta_fun The method for ordinal variables.
-data_get_delta_fun.ordinal <- function(vars, scale, region, variables, breaks,
+data_get_delta_fun.ordinal <- function(vars, scale, region, variables, schema, breaks,
                                        reduce = TRUE, time, ...) {
 
   # Get data
@@ -509,7 +512,7 @@ data_get_delta_fun.ordinal <- function(vars, scale, region, variables, breaks,
 
 #' @describeIn data_get The method for bivar.
 #' @export
-data_get.delta_bivar <- function(vars, scale, region, variables, time, ...) {
+data_get.delta_bivar <- function(vars, scale, region, variables, schema, time, ...) {
 
   # Retrieve
   data_vl <- data_get_delta(
@@ -549,7 +552,7 @@ data_get.delta_bivar <- function(vars, scale, region, variables, time, ...) {
 
 #' @describeIn data_get The method for bivar_ldelta_rq3.
 #' @export
-data_get.bivar_ldelta_rq3 <- function(vars, scale, region, variables, time, ...) {
+data_get.bivar_ldelta_rq3 <- function(vars, scale, region, variables, schema, time, ...) {
   # Reconstruct vars for delta
   vl_vars <- vars_build(var_left = vars$var_left, scale = scale, time = time$var_left)
   vl_time <- vl_vars$time
@@ -600,7 +603,7 @@ data_get.bivar_ldelta_rq3 <- function(vars, scale, region, variables, time, ...)
 #' @param vr_vl <`character`> Is the parent data coming from the var_left
 #' or var_right? How should it be renamed.
 #' @export
-data_get.default <- function(vars, scale, region, variables, vr_vl, ...) {
+data_get.default <- function(vars, scale, region, variables, schema, vr_vl, ...) {
   # Check if `vars` has been entered without being subset from `vars_build()`
   if (all(c("vars", "time") %in% names(vars))) {
     stop("`vars` is invalid. Subset `$vars` from the output of `vars_build()`.")
@@ -613,7 +616,7 @@ data_get.default <- function(vars, scale, region, variables, vr_vl, ...) {
 
   # Default method retrieves the data of the first element of `vars`
   data <- if (var == "area") {
-    db_get(select = c("ID", "area"), from = scale, schema = "mtl")
+    db_get(select = c("id", "area"), from = scale, schema = schema)
   } else {
     db_get_data_from_sql(var = var, scale = scale, region = region)
   }

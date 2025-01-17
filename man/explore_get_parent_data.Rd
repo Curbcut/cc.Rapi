@@ -11,7 +11,8 @@ explore_get_parent_data(
   scale,
   col = "var_left",
   time_col,
-  region
+  region,
+  schema = schema
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ directory containing the QS files. Default is "data/".}
 
 \item{region}{<\code{character}> Character string specifying the name of the region.
 Usually equivalent of \code{r$region()}.}
+
+\item{schema}{<\code{character}>}
 }
 \value{
 A vector containing the parent value for the zone.

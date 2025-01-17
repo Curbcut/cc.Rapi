@@ -81,7 +81,7 @@ legend_render.q5 <- function(vars, font_family = "acidgrotesk-book", scale,
   leg <- leg_info$colours_dfs$left_5[2:6, 2:3]
 
   # Get real q5 breaks
-  brks <- attr(data, "breaks_var_left")
+  brks <- attr(data, "breaks_var_left") |> unlist()
 
   # If all NA, don't bother draw a legend. Return NULL
   if (all(is.na(brks))) {

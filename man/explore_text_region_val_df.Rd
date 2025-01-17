@@ -15,6 +15,7 @@ explore_text_region_val_df(
   time,
   schemas = NULL,
   variables,
+  schema,
   ...
 )
 }

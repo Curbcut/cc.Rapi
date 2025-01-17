@@ -26,7 +26,7 @@
 #' @return The resulting text.
 #' @export
 explore_text_values_q5 <- function(var, region, data,
-                                   variables, ...) {
+                                   variables, schema, ...) {
   UseMethod("explore_text_values_q5", var)
 }
 
@@ -34,7 +34,7 @@ explore_text_values_q5 <- function(var, region, data,
 #' @export
 explore_text_values_q5.pct <- function(var, region,
                                        data, variables, scale, select_id,
-                                       col = "var_left", lang, time, schemas = NULL, ...) {
+                                       col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the parent variable
   parent_string <- explore_text_parent_title(var, variables = variables, lang = lang)
 
@@ -56,6 +56,7 @@ explore_text_values_q5.pct <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -91,7 +92,7 @@ explore_text_values_q5.pct <- function(var, region,
 #' @export
 explore_text_values_q5.count <- function(var, region,
                                          data, variables, scale, select_id,
-                                         col = "var_left", lang, time, schemas = NULL, ...) {
+                                         col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the parent variable
   parent_string <- explore_text_parent_title(var, variables = variables, lang = lang)
 
@@ -113,6 +114,7 @@ explore_text_values_q5.count <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -149,7 +151,7 @@ explore_text_values_q5.count <- function(var, region,
 #' @export
 explore_text_values_q5.dollar <- function(var, region,
                                           data, variables, scale, select_id,
-                                          col = "var_left", lang, time, schemas = NULL, ...) {
+                                          col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the region values
   region_values <- explore_text_region_val_df(
     var = var,
@@ -162,6 +164,7 @@ explore_text_values_q5.dollar <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -203,7 +206,7 @@ explore_text_values_q5.dollar <- function(var, region,
 #' @export
 explore_text_values_q5.ind <- function(var, region,
                                        data, variables, scale, select_id,
-                                       col = "var_left", lang, time, schemas = NULL, ...) {
+                                       col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the parent variable
   parent_string <- explore_text_parent_title(var, variables = variables, lang = lang)
 
@@ -219,6 +222,7 @@ explore_text_values_q5.ind <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -293,7 +297,7 @@ explore_text_values_q5.ind <- function(var, region,
 #' @export
 explore_text_values_q5.avg <- function(var, region,
                                        data, variables, scale, select_id,
-                                       col = "var_left", lang, time, schemas = NULL, ...) {
+                                       col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the parent variable
   parent_string <- explore_text_parent_title(var, variables = variables)
 
@@ -309,6 +313,7 @@ explore_text_values_q5.avg <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -370,7 +375,7 @@ explore_text_values_q5.avg <- function(var, region,
 #' @export
 explore_text_values_q5.sqkm <- function(var, region,
                                         data, variables, scale, select_id,
-                                        col = "var_left", lang, time, schemas = NULL, ...) {
+                                        col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the region values
   region_values <- explore_text_region_val_df(
     var = var,
@@ -383,6 +388,7 @@ explore_text_values_q5.sqkm <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 
@@ -436,7 +442,7 @@ explore_text_values_q5.per1k <- function(var, region,
 #' @export
 explore_text_values_q5.ppo <- function(var, region,
                                        data, variables, scale, select_id,
-                                       col = "var_left", lang, time, schemas = NULL, ...) {
+                                       col = "var_left", lang, time, schemas = NULL, schema, ...) {
   # Grab the region values
   region_values <- explore_text_region_val_df(
     var = var,
@@ -449,6 +455,7 @@ explore_text_values_q5.ppo <- function(var, region,
     time = time,
     schemas = schemas,
     variables = variables,
+    schema = schema,
     ...
   )
 

@@ -14,6 +14,7 @@ region_value(
   col,
   schemas = NULL,
   variables,
+  schema,
   ...
 )
 }

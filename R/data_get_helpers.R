@@ -339,7 +339,7 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   )]
 
   # Calculate breaks
-  data_val <- data[!names(data) %in% c("ID", "scale")]
+  data_val <- data[!names(data) %in% c("id", "scale")]
   breaks_var <- variables$breaks_var[variables$var_code == var]
   if (is.na(breaks_var)) {
     recent <- max(variables$dates[variables$var_code == var][[1]])
@@ -379,7 +379,7 @@ data_append_breaks <- function(var, data, q3_q5 = "q5", rename_col = "var_left",
   # Rework breaks just for assembling (we want to include ALL observations)
   if (!is.null(breaks)) {
 
-    assemble_breaks <- breaks
+    assemble_breaks <- unlist(breaks)
     assemble_breaks[1] <- -Inf
     assemble_breaks[length(assemble_breaks)] <- Inf
 

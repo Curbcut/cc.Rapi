@@ -65,7 +65,7 @@ explore_graph.q5 <- function(vars, select_id, scale, data, time, schemas,
   rcol <- match_schema_to_col(data = data, time = time, schemas = schemas)
 
   # Keep the data inside the breaks
-  vl_breaks <- attr(data, "breaks_var_left")
+  vl_breaks <- attr(data, "breaks_var_left") |> unlist()
   data_inrange <- filter_inrange(
     data = data, col = rcol, range = vl_breaks,
     select_id = shared_info$select_id
@@ -161,8 +161,8 @@ explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
     time = time,
     schemas = schemas
   )
-  vr_breaks <- attr(data, "breaks_var_right")
-  vl_breaks <- attr(data, "breaks_var_left")
+  vr_breaks <- attr(data, "breaks_var_right") |> unlist()
+  vl_breaks <- attr(data, "breaks_var_left") |> unlist()
 
   # Remove out-of-bounds
   data_in_range <- filter_inrange(
