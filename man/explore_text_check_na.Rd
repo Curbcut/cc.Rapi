@@ -23,7 +23,7 @@ the start of the output sentence. The output of \code{\link{explore_context}}}
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The output of \code{\link{data_get}}.}
 
-\item{select_id}{<\code{character}> the current selected ID, usually
+\item{select_id}{<\code{character}> the current selected id, usually
 \code{r[[id]]$select_id()}. If there is a selection (select_id is not NA), the
 name of the selected polygon will appear.}
 

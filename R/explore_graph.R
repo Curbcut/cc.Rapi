@@ -116,7 +116,7 @@ explore_graph.q5 <- function(vars, select_id, scale, data, time, schemas,
 
   # Add selection
   if (!is.na(shared_info$select_id)) {
-    val <- data_inrange[[rcol]][data_inrange$ID == shared_info$select_id]
+    val <- data_inrange[[rcol]][data_inrange$id == shared_info$select_id]
     if (!any(is.na(val))) {
       plot <-
         plot +
@@ -247,7 +247,7 @@ explore_graph.bivar <- function(vars, select_id, scale, data, time, schemas,
 
   # Add selection
   if (!is.na(shared_info$select_id)) {
-    val <- data_in_range[data_in_range$ID == shared_info$select_id, ]
+    val <- data_in_range[data_in_range$id == shared_info$select_id, ]
     if (!any(is.na(val))) {
       plot <-
         plot +
@@ -365,7 +365,7 @@ explore_graph.delta <- function(vars, select_id, scale, data, time, schemas,
       dat[1, xcol] <- val[1]
       dat[1, ycol] <- val[2]
       dat
-    } else data[data$ID == shared_info$select_id, ]
+    } else data[data$id == shared_info$select_id, ]
     if (!any(is.na(dat))) {
       plot <-
         plot +
@@ -443,7 +443,7 @@ explore_graph.delta_bivar <- function(vars, select_id, scale, data, time, schema
 
   # Add selection
   if (!is.na(shared_info$select_id)) {
-    val <- data[data$ID == shared_info$select_id, ]
+    val <- data[data$id == shared_info$select_id, ]
     if (!any(is.na(val))) {
       plot <-
         plot +

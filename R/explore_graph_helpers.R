@@ -45,7 +45,7 @@ explore_graph_info <- function(vars, font_family = "acidgrotesk-book", lang = NU
 
 
   # In the case where the selected ID is not in data, clear the selection
-  if (!is.na(select_id) & !select_id %in% data$ID) {
+  if (!is.na(select_id) & !select_id %in% data$id) {
     select_id <- NA
   }
 

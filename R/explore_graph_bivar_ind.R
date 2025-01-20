@@ -114,7 +114,7 @@ explore_graph_bivar_ind.ordinal <- function(vars, select_id, scale, data, time, 
 
   # Add selection
   if (!is.na(shared_info$select_id)) {
-    val <- data[data$ID == shared_info$select_id, ]
+    val <- data[data$id == shared_info$select_id, ]
     if (!any(is.na(val))) {
       plot <-
         plot +

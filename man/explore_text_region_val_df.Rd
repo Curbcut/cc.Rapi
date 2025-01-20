@@ -26,7 +26,7 @@ frame needs to be retrieved.}
 \item{region}{<\code{character}> Character string specifying the name of the region.
 Usually equivalent of \code{r$region()}.}
 
-\item{select_id}{<\code{character}> the current selected ID, usually
+\item{select_id}{<\code{character}> the current selected id, usually
 \code{r[[id]]$select_id()}.}
 
 \item{col}{<\code{character}> Which column of \code{data} should be selected to grab the

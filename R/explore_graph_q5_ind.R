@@ -97,7 +97,7 @@ explore_graph_q5_ind.scalar <- function(vars, select_id, scale, data, time, sche
 
   # Add selection
   if (!is.na(shared_info$select_id) | !is.null(val)) {
-    val <- if (!is.null(val)) val else data[[rcol]][data$ID == shared_info$select_id]
+    val <- if (!is.null(val)) val else data[[rcol]][data$id == shared_info$select_id]
     if (!any(is.na(val))) {
       plot <-
         plot +
@@ -173,7 +173,7 @@ explore_graph_q5_ind.ordinal <- function(vars, select_id, scale, data, time, sch
   # Add selection
   if (!is.na(shared_info$select_id) | !is.null(val)) {
     if (is.null(val)) {
-      data[[rcol]][data$ID == shared_info$select_id]
+      data[[rcol]][data$id == shared_info$select_id]
     }
     if (!any(is.na(val))) {
       plot <-

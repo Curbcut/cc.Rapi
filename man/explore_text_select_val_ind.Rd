@@ -53,7 +53,7 @@ values need to be generated. Usually one element of the output of
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The output of \code{\link{data_get}}.}
 
-\item{select_id}{<\code{character}> The ID of the selected zone.}
+\item{select_id}{<\code{character}> The id of the selected zone.}
 
 \item{col}{<\code{character}> Which column of \code{data} should be selected to grab the
 value information. Defaults to \code{var_left}, but could also be \code{var_right} or

@@ -73,7 +73,7 @@ data_get_colours_helper <- function(vars, region, time, zoom_levels, colours_tab
   mapping <- match(data[[group]], colour_table$group)
   data$fill <- colour_table$fill[mapping]
   data <- data[c("id", "fill")]
-  names(data)[1] <- c("ID_color")
+  names(data)[1] <- c("id_color")
 
   # Switch NA to the right "NA" colour
   data$fill[is.na(data$fill)] <- colour_table$fill[grepl("^NA", colour_table$group)][[1]]
@@ -179,7 +179,7 @@ data_get_colours.bivar_ldelta_rq3 <- function(vars, region, time, zoom_levels,
 #' @seealso \code{\link{data_get_colours}}
 data_get_colours.default <- function(vars, region, time, zoom_levels,
                                      variables, schemas, ...) {
-  data <- data.frame(ID = "NA")
+  data <- data.frame(id = "NA")
   data$fill <- "#B3B3BB"
   return(data)
 }

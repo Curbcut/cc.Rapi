@@ -89,7 +89,7 @@ or var_right? How should it be renamed.}
 }
 \value{
 A dataframe containing the data according to the class of \code{vars},
-with an ID column, one column per year of data, and one \code{group} column per
+with an id column, one column per year of data, and one \code{group} column per
 year of data.
 }
 \description{

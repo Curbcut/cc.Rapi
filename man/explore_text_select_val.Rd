@@ -53,7 +53,7 @@ values need to be generated. Usually one element of the output of
 
 \item{...}{Additional arguments passed to the dispatched function.}
 
-\item{select_id}{<\code{character}> The ID of the selected zone.}
+\item{select_id}{<\code{character}> The id of the selected zone.}
 
 \item{data}{<\code{data.frame}> A data frame containing the variables and
 observations. The output of \code{\link{data_get}}.}

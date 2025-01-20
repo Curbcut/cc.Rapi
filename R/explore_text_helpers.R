@@ -6,7 +6,7 @@
 #'
 #' @param region <`character`> String specifying the code of the region to
 #' retrieve, e.g. `CMA`. Usually equivalent of `r$region()`.
-#' @param select_id <`character`> the current selected ID, usually
+#' @param select_id <`character`> the current selected id, usually
 #' `r[[id]]$select_id()`. If there is a selection (select_id is not NA), the
 #' name of the selected polygon will appear.
 #' @param scale <`reactive character`> Current scale. The output of
@@ -56,7 +56,7 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
 
   # Get the place heading and glue it
   dat <- db_get(select = c("name", "name_2"),
-                from = scale_grab_chr_for, where = list(ID = select_id),
+                from = scale_grab_chr_for, where = list(id = select_id),
                 schema = schema)
 
   # the selection is not found in the database
@@ -68,10 +68,10 @@ explore_context <- function(region, select_id, scale, switch_DA, top_scale,
     name_2 <- db_get_helper(sprintf('SELECT name FROM %s."%s" WHERE "id"::text = (
               SELECT replace(
                          CASE
-                             WHEN jsonb_typeof("%s_ID") = \'array\' THEN
-                                 ("%s_ID"->>0)::text
+                             WHEN jsonb_typeof("%s_id") = \'array\' THEN
+                                 ("%s_id"->>0)::text
                              ELSE
-                                 ("%s_ID"::text)
+                                 ("%s_id"::text)
                          END, \'"\', \'\')
               FROM %s."%s"
               WHERE "id"::text = \'%s\')',
@@ -145,7 +145,7 @@ explore_text_parent_title <- function(var, variables, lang = NULL) {
 #' frame needs to be retrieved.
 #' @param region <`character`> Character string specifying the name of the region.
 #' Usually equivalent of `r$region()`.
-#' @param select_id <`character`> the current selected ID, usually
+#' @param select_id <`character`> the current selected id, usually
 #' `r[[id]]$select_id()`.
 #' @param col <`character`> Which column of `data` should be selected to grab the
 #' value information. Defaults to `var_left`, but could also be `var_right` or
@@ -192,15 +192,15 @@ explore_text_region_val_df <- function(var, region, select_id, col = "var_left",
   ))
 }
 
-#' Get parent data for a given variable and ID
+#' Get parent data for a given variable and id
 #'
-#' This function retrieves the parent data for a given variable and ID.
+#' This function retrieves the parent data for a given variable and id.
 #' If a time variable is present in the dataset, the time value is
 #' added to the parent string to retrieve the corresponding data.
 #'
 #' @param var <`character`> The code of the variable for which to retrieve the
 #' parent data.
-#' @param select_id <`character`> The ID of the selected zone for which to
+#' @param select_id <`character`> The id of the selected zone for which to
 #' retrieve the parent data.
 #' @param scale <`character`> The crrent scale, e.g. `"CT"`
 #' @param col <`character`> Which column of `data` should be selected to grab the
@@ -228,7 +228,7 @@ explore_get_parent_data <- function(var, variables, select_id, scale, col = "var
   rcol <- sprintf("%s_%s", col, time_col)
 
   # Get the parent value for the zone
-  all_count <- parent_data[[rcol]][parent_data$ID == select_id]
+  all_count <- parent_data[[rcol]][parent_data$id == select_id]
 
   # Return
   return(all_count)
@@ -243,7 +243,7 @@ explore_get_parent_data <- function(var, variables, select_id, scale, col = "var
 #' @param var <`character`> The variable code of the variable for which the
 #' values need to be generated. Usually one element of the output of
 #' \code{\link{vars_build}}.
-#' @param select_id <`character`> The ID of the selected zone.
+#' @param select_id <`character`> The id of the selected zone.
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
 #' @param scale <`character`> Current scale. The output of
@@ -270,15 +270,15 @@ explore_text_select_val.pct <- function(var, variables, select_id, data, scale, 
   # Create empty vector
   out <- c()
 
-  # Throw error if the selected ID is not in the data.
-  if (!select_id %in% data$ID) {
+  # Throw error if the selected id is not in the data.
+  if (!select_id %in% data$id) {
     stop(sprintf("`%s` is not in the data.", select_id))
   }
 
   rcol <- match_schema_to_col(data = data, time = time, col = col, schemas = schemas)
 
   # Add the percentage value for the selection. Second column is always
-  out$val <- data[[rcol]][data$ID == select_id]
+  out$val <- data[[rcol]][data$id == select_id]
 
   # Get the parent data
   all_count <- explore_get_parent_data(
@@ -311,7 +311,7 @@ explore_text_select_val.ind <- function(var, variables, data, select_id, col = "
 #' @param var <`character`> The variable code of the variable for which the
 #' values need to be generated. Usually one element of the output of
 #' \code{\link{vars_build}}.
-#' @param select_id <`character`> The ID of the selected zone.
+#' @param select_id <`character`> The id of the selected zone.
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
 #' @param col <`character`> Which column of `data` should be selected to grab the
@@ -344,8 +344,8 @@ explore_text_select_val_ind.scalar <- function(var, variables, data, select_id, 
   # Create empty vector
   out <- c()
 
-  # Throw error if the selected ID is not in the data.
-  if (is.null(val) & !select_id %in% data$ID) {
+  # Throw error if the selected id is not in the data.
+  if (is.null(val) & !select_id %in% data$id) {
     stop(sprintf("`%s` is not in the data.", select_id))
   }
 
@@ -354,7 +354,7 @@ explore_text_select_val_ind.scalar <- function(var, variables, data, select_id, 
     brk_col <- sprintf("%s_q5", rcol)
 
     # Get the group in which falls the selection
-    rank <- data[[brk_col]][data$ID == select_id]
+    rank <- data[[brk_col]][data$id == select_id]
   } else {
     findInterval(val, attr(data, "breaks_var_left") |> unlist())
   }
@@ -366,7 +366,7 @@ explore_text_select_val_ind.scalar <- function(var, variables, data, select_id, 
   # Lower letters
   out$val <- tolower(cc_t(out$val, lang = lang))
 
-  out$num <- if (!is.null(val)) val else data[[rcol]][data$ID == select_id]
+  out$num <- if (!is.null(val)) val else data[[rcol]][data$id == select_id]
 
   # Return
   return(out)
@@ -381,8 +381,8 @@ explore_text_select_val_ind.ordinal <- function(var, variables, data, select_id,
   # Create empty vector
   out <- c()
 
-  # Throw error if the selected ID is not in the data.
-  if (is.null(val) & !select_id %in% data$ID) {
+  # Throw error if the selected id is not in the data.
+  if (is.null(val) & !select_id %in% data$id) {
     stop(sprintf("`%s` is not in the data.", select_id))
   }
 
@@ -390,7 +390,7 @@ explore_text_select_val_ind.ordinal <- function(var, variables, data, select_id,
     rcol <- match_schema_to_col(data, time = time, col = col, schemas = schemas)
 
     # Get the group in which falls the selection
-    data[[rcol]][data$ID == select_id]
+    data[[rcol]][data$id == select_id]
   }
 
   # Grab the rank name for the rank
@@ -414,15 +414,15 @@ explore_text_select_val.default <- function(var, variables, data, select_id, col
   # Create empty vector
   out <- c()
 
-  # Throw error if the selected ID is not in the data.
-  if (!select_id %in% data$ID) {
+  # Throw error if the selected id is not in the data.
+  if (!select_id %in% data$id) {
     stop(sprintf("`%s` is not in the data.", select_id))
   }
 
   rcol <- match_schema_to_col(data = data, time = time, col = col, schemas = schemas)
 
   # Add the value for the selection
-  out$val <- data[[rcol]][data$ID == select_id]
+  out$val <- data[[rcol]][data$id == select_id]
 
   # Return
   return(out)
@@ -439,8 +439,8 @@ explore_text_select_val.default <- function(var, variables, data, select_id, col
 #' variable will be compared across observations.
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The data frame must have columns named var_left
-#' and ID. The output of \code{\link{data_get}}.
-#' @param select_id <`character`> The ID of the selected zone for which to
+#' and id. The output of \code{\link{data_get}}.
+#' @param select_id <`character`> The id of the selected zone for which to
 #' retrieve the ranking.
 #' @param col <`character`> Which column of `data` should be selected to grab the
 #' value information. Defaults to `var_left`, but could also be `var_right` or
@@ -478,8 +478,8 @@ explore_text_selection_comparison <- function(var = NULL, variables, data, selec
                                               ranks_override = NULL,
                                               lang = NULL, time_col, schemas = NULL,
                                               larger = FALSE, val = NULL) {
-  # Throw error if the selected ID is not in the data.
-  if (is.null(val) & !select_id %in% data$ID) {
+  # Throw error if the selected id is not in the data.
+  if (is.null(val) & !select_id %in% data$id) {
     stop(sprintf("`%s` is not in the data.", select_id))
   }
 
@@ -490,7 +490,7 @@ explore_text_selection_comparison <- function(var = NULL, variables, data, selec
   # If val is supplied. In the case two values are supplied, it's a delta.
   current_val <- if (!is.null(val)) {
     if (length(val) == 2) (val[2] - val[1]) / val[1] else val
-  } else data[[rcol]][data$ID == select_id]
+  } else data[[rcol]][data$id == select_id]
 
   # The value is higher than X of other observations
   higher_than <- current_val > data[[rcol]]
@@ -685,7 +685,7 @@ explore_text_color <- function(x, meaning) {
 #'   the start of the output sentence. The output of \code{\link{explore_context}}
 #' @param data <`data.frame`> A data frame containing the variables and
 #' observations. The output of \code{\link{data_get}}.
-#' @param select_id <`character`> the current selected ID, usually
+#' @param select_id <`character`> the current selected id, usually
 #' `r[[id]]$select_id()`. If there is a selection (select_id is not NA), the
 #' name of the selected polygon will appear.
 #' @param vars <`character`> A list containing the variable names for which the
@@ -749,7 +749,7 @@ explore_text_check_na <- function(context, variables, data, select_id, vars, tim
       return(NULL)
     }
 
-    val <- data[[col]][data$ID == select_id]
+    val <- data[[col]][data$id == select_id]
     if (length(val) == 0) stop(sprintf("`%s` is not in the data.", select_id))
 
     if (!is.na(val)) {

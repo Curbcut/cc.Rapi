@@ -38,8 +38,8 @@ to be for. Defaults to var_left.}
 (if there are multiple scales)}
 }
 \value{
-A data frame with the following columns: ID, var_1, var_2, and var.
-\code{ID} is the ID column from the original data, \code{var_1} and \code{var_2} are the
+A data frame with the following columns: id, var_1, var_2, and var.
+\code{id} is the id column from the original data, \code{var_1} and \code{var_2} are the
 values of the two variables being compared, and \code{var} is the percentage
 change between the two variables.
 }

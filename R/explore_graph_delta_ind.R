@@ -143,7 +143,7 @@ explore_graph_delta_ind.ordinal <- function(vars, select_id, scale, data, time, 
       dat[1, xcol] <- val[1]
       dat[1, ycol] <- val[2]
       dat
-    } else data[data$ID == shared_info$select_id, ]
+    } else data[data$id == shared_info$select_id, ]
     if (!any(is.na(dat))) {
       plot <-
         plot +

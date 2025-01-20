@@ -31,7 +31,7 @@ db_get_data_from_sql <- function(vars_vector, scales, region, schema) {
       var_selections[[scale]] <-
         sprintf("SELECT *, '%s' AS scale
   FROM %s.\"%s_%s\"
-  WHERE id IN (SELECT ID FROM ids)", scale, schema, scale, var)
+  WHERE id IN (SELECT id FROM ids)", scale, schema, scale, var)
     }
     all_vars[[var]] <- paste0(var, " AS (", paste0(var_selections, collapse = " UNION ALL "), ")")
 
@@ -59,14 +59,14 @@ db_get_data_from_sql <- function(vars_vector, scales, region, schema) {
   # Execute the final query
   result <- db_get_helper(final_call)
 
-  # Remove ID... and scale...
+  # Remove id... and scale...
   if (sum(grepl("id\\.\\.|scale\\.\\.", names(result))) > 0)
     result <- result[-grep("id\\.\\.|scale\\.\\.", names(result))]
 
   # Go over potentially expected duplicated columns
-  duplicate_ID <- grep("^id$", names(result))
-  if (length(duplicate_ID) > 1)
-    result <- result[-duplicate_ID[2:length(duplicate_ID)]]
+  duplicate_id <- grep("^id$", names(result))
+  if (length(duplicate_id) > 1)
+    result <- result[-duplicate_id[2:length(duplicate_id)]]
   duplicate_scale <- grep("^scale$", names(result))
   if (length(duplicate_scale) > 1)
     result <- result[-duplicate_scale[2:length(duplicate_scale)]]
@@ -98,8 +98,8 @@ db_get_data_from_sql <- function(vars_vector, scales, region, schema) {
 #' @param reduce <`logical`> Should the dataframe be reduced to a single table
 #' (if there are multiple scales)
 #'
-#' @return A data frame with the following columns: ID, var_1, var_2, and var.
-#' `ID` is the ID column from the original data, `var_1` and `var_2` are the
+#' @return A data frame with the following columns: id, var_1, var_2, and var.
+#' `id` is the id column from the original data, `var_1` and `var_2` are the
 #' values of the two variables being compared, and `var` is the percentage
 #' change between the two variables.
 data_get_delta <- function(vars, time, scale, variables, breaks, region,
@@ -190,7 +190,7 @@ data_get_delta <- function(vars, time, scale, variables, breaks, region,
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A dataframe containing the data according to the class of `vars`,
-#' with an ID column, one column per year of data, and one `group` column per
+#' with an id column, one column per year of data, and one `group` column per
 #' year of data.
 #' @export
 data_get <- function(vars, scale, region, variables, schema, ...) {

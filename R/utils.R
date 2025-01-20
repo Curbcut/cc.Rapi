@@ -598,14 +598,14 @@ grab_DA_ID_from_bslike <- function(scale, select_id) {
   # If it's a 'scales_as_DA', and the `df` is not in the global environment,
   # search for a connection.
   if (is.null(dat)) {
-    out <- db_get(select = "DA_ID", from = scale, where = list(ID = select_id))
+    out <- db_get(select = "da_id", from = scale, where = list(id = select_id))
     out <- unname(unlist(out))
 
     # If length is zero, it means the selection was for another scale before,
     # and the user zoomed on building. Return as if it's NA.
     if (length(out) == 0) out <- NA
   } else {
-    out <- dat$DA_ID[dat$ID == select_id]
+    out <- dat$da_id[dat$id == select_id]
   }
 
   return(out)
@@ -895,7 +895,7 @@ filter_inrange <- function(data, col, range, select_id = NA) {
   # If selection, tweak range to keep ID in range
   if (!is.na(select_id)) {
     # Get the ID value
-    id_val <- dat[[col]][dat$ID == select_id]
+    id_val <- dat[[col]][dat$id == select_id]
 
     if (length(id_val) == 0) {
       attr(data, sprintf("updated_range_%s", col)) <- FALSE

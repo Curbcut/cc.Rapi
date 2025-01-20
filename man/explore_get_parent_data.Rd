@@ -2,7 +2,7 @@
 % Please edit documentation in R/explore_text_helpers.R
 \name{explore_get_parent_data}
 \alias{explore_get_parent_data}
-\title{Get parent data for a given variable and ID}
+\title{Get parent data for a given variable and id}
 \usage{
 explore_get_parent_data(
   var,
@@ -19,7 +19,7 @@ explore_get_parent_data(
 \item{var}{<\code{character}> The code of the variable for which to retrieve the
 parent data.}
 
-\item{select_id}{<\code{character}> The ID of the selected zone for which to
+\item{select_id}{<\code{character}> The id of the selected zone for which to
 retrieve the parent data.}
 
 \item{scale}{<\code{character}> The crrent scale, e.g. \code{"CT"}}
@@ -40,7 +40,7 @@ Usually equivalent of \code{r$region()}.}
 A vector containing the parent value for the zone.
 }
 \description{
-This function retrieves the parent data for a given variable and ID.
+This function retrieves the parent data for a given variable and id.
 If a time variable is present in the dataset, the time value is
 added to the parent string to retrieve the corresponding data.
 }

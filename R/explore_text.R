@@ -57,7 +57,7 @@ explore_text.q5 <- function(vars, region, select_id, scale, time, data,
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
   if (is.null(shown_scale) & is.null(val)) {
-    if (!select_id %in% data$ID) select_id <- NA
+    if (!select_id %in% data$id) select_id <- NA
   }
 
   # Grab the shared info
@@ -187,7 +187,7 @@ explore_text.bivar <- function(vars, region, select_id, scale, time, data,
   }
 
   # Adjust the selected ID in the case where the selection is not in `data`
-  if (!select_id %in% data$ID) select_id <- NA
+  if (!select_id %in% data$id) select_id <- NA
 
   # Grab the shared info
   context <- explore_context(
@@ -459,7 +459,7 @@ explore_text.delta <- function(vars, region, select_id, scale, time, data,
   # Adjust the selected ID in the case where the selection is not in `data`,
   # except if there is a value supplied, meaning
   if (is.null(shown_scale) & is.null(val)) {
-    if (!select_id %in% data$ID) select_id <- NA
+    if (!select_id %in% data$id) select_id <- NA
   }
 
   # Grab the shared info
@@ -596,7 +596,7 @@ explore_text.delta_bivar <- function(vars, region, select_id, scale, time, data,
                                      variables, lang = NULL, schema, ...) {
 
   # Adjust the selected ID in the case where the selection is not in `data`
-  if (!select_id %in% data$ID) select_id <- NA
+  if (!select_id %in% data$id) select_id <- NA
 
   # Grab the shared info
   context <- explore_context(

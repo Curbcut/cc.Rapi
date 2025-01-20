@@ -4,14 +4,14 @@
 # # breaks <- list(breaksMainVar = data.frame(break_value = c(1,1.9,2.3,3)),
 # #                breaksCompareVar = data.frame(break_value = c(0,0.2,0.3,0.7)))
 # var_right = " "
-# scale <- "csd"
+# scale <- "da"
 # region <- "01"
 # time <- c(2021)
-# select_id <- NA
+# select_id <- "35201177"
 # schema <- "public"
 # lang <- NULL
 # schemas = list(var_left = list(time = time), var_right = list(time = time))
-# zoom_levels <- c("pr", "csd", "da", "db")
+# zoom_levels <- c("pr", "csd", "da")
 # db_pool <- db_connection()
 # font_family <-  "acidgrotesk-book"
 

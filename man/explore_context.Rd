@@ -19,7 +19,7 @@ explore_context(
 \item{region}{<\code{character}> String specifying the code of the region to
 retrieve, e.g. \code{CMA}. Usually equivalent of \code{r$region()}.}
 
-\item{select_id}{<\code{character}> the current selected ID, usually
+\item{select_id}{<\code{character}> the current selected id, usually
 \code{r[[id]]$select_id()}. If there is a selection (select_id is not NA), the
 name of the selected polygon will appear.}
 
